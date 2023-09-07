@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Warframe relic message generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+</head>
+<style>
+    body {
+        background-color: #0a0a0a;
+    }
+
+    .main-div {
+        background-color: #444444;
+        color: #ffffff;
+        margin: CALC(2% + 20px);
+        border-radius: 10px;
+        padding: 18px;
+    }
+    .collapse-div {
+        background-color: #444444;
+        color: #ffffff;
+        border-radius: 10px;
+        padding: 18px;
+    }
+    .collapse-block {
+        margin: CALC(2% + 20px);
+    }
+
+    .grid-container {
+        width: auto;
+        height: 318px;
+        display: grid;
+        grid-template-columns: 8fr 10px 2fr 50px;
+        grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr;
+    }
+    .grid-container select {
+        color: #999;
+    }
+    .grid-container input {
+        font-weight: bold;
+        color: #000;
+    }
+    .grid-container input::placeholder {
+        font-weight: normal;
+        color: #999;
+    }
+
+    .title-block {
+        grid-column-start: 1;
+        grid-column-end: last-line;
+        grid-row-start: 1;
+        grid-row-end: 1;
+        color: #fff;
+        font-size: 25px;
+        text-align: center;
+    }
+    .settings-button-holder {
+        grid-column-start: 4;
+        grid-column-end: 5;
+        grid-row-start: 1;
+        grid-row-end: 1;
+    }
+    .settings-button-holder a {
+        color: #fff;
+        font-size: 28px;
+    }
+    .info-button-holder {
+        grid-column-start: 1;
+        grid-column-end: 1;
+        grid-row-start: 1;
+        grid-row-end: 1;
+        margin-left: 20px;
+    }
+    .info-button-holder a {
+        color: #fff;
+        font-size: 28px;
+    }
+    i {
+        cursor: pointer;
+    }
+    
+    a:hover {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .relic-block {
+        height: 100%;
+        padding-top: 7px;
+        margin-left: 6px;
+        font-size: 20px;
+        text-align: center;
+        margin-top: auto;
+        margin-bottom: auto;
+        display: grid;
+        grid-template-columns: 2fr 2fr 2fr 1fr;
+    }
+    .relic-block.active {
+        border-radius: 7px;
+        background-color: #365b91;
+    }
+
+    .block1 {
+        grid-column-start: 1;
+        grid-column-end: 1;
+        grid-row-start: 2;
+        grid-row-end: 2;
+    }
+
+    .block2 {
+        grid-column-start: 1;
+        grid-column-end: 1;
+        grid-row-start: 3;
+        grid-row-end: 3;
+    }
+
+    .block3 {
+        grid-column-start: 1;
+        grid-column-end: 1;
+        grid-row-start: 4;
+        grid-row-end: 4;
+    }
+
+    .block4 {
+        grid-column-start: 1;
+        grid-column-end: 1;
+        grid-row-start: 5;
+        grid-row-end: 5;
+    }
+
+    .team-block-label {
+        display: grid;
+        grid-column-start: 3;
+        grid-column-end: 5;
+        grid-row-start: 2;
+        grid-row-end: 2;
+        font-size: 20px;
+        text-align: center;
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+    .team-block {
+        grid-column-start: 3;
+        grid-column-end: 5;
+        grid-row-start: 3;
+        grid-row-end: 3;
+        text-align: center;
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+    .team-block-border {
+        display: grid;
+        grid-column-start: 3;
+        grid-column-end: 5;
+        grid-row-start: 2;
+        grid-row-end: 4;
+        margin: 7px 0;
+        border-radius: 10px;
+        border: #365b91 2px solid;
+    }
+
+    .save-relic-block {
+        grid-column-start: 3;
+        grid-column-end: 5;
+        grid-row-start: 4;
+        grid-row-end: 5;
+        text-align: center;
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+
+    .submit-block {
+        grid-column-start: 3;
+        grid-column-end: 5;
+        grid-row-start: 5;
+        grid-row-end: 6;
+        text-align: center;
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+
+    .select-container {
+        margin-left: 10px;
+    }
+
+    .radio-container input {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    .radio-container label {
+        font-size: 22px;
+        line-height: 19PX;
+        margin-left: 2px;
+    }
+
+    .form-check-input {
+        margin-top: 0;
+        vertical-align: middle;
+    }
+
+    .active-text {
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 10px;
+        color: #fff;
+        user-select: none;
+    }
+
+    .spam-button {
+        width: 100%;
+    }
+	.save-button {
+		width: 100%;
+	}
+
+    .btn:focus {
+        box-shadow: none;
+    }
+
+    .noti-block {
+        grid-column-start: 1;
+        grid-column-end: last-line;
+        grid-row-start: 6;
+        grid-row-end: 6;
+        color: #fff;
+        font-size: 22px;
+        text-align: center;
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+
+    .version-label {
+        align-self: center;
+        padding-left: 30px;
+        text-align: right;
+    }
+</style>
+<body>
+<div class='main-div'>
+    <div class='grid-container'>
+        <div class='title-block'>
+            Warframe Relic Message Generator
+        </div>
+        <div class="info-button-holder">
+            <a data-bs-toggle="collapse" href="#infoCollapseWrapper">
+                <i class="bi-info-circle"></i>
+            </a>
+        </div>
+        <div class="settings-button-holder">
+            <a data-bs-toggle="collapse" href="#settingsCollapseWrapper">
+                <i class="bi-gear"></i>
+            </a>
+        </div>
+        <div class='relic-block block1'>
+            <div class="select-container">
+                <select class='form-control' id='rt1'>
+                    <option selected disabled hidden>type</option>
+                    <option value='Lith'>Lith</option>
+                    <option value='Meso'>Meso</option>
+                    <option value='Neo'>Neo</option>
+                    <option value='Axi'>Axi</option>
+                    <option value='Requiem'>Requiem</option>
+                </select>
+            </div>
+            <div class="select-container">
+                <input id='rn1' class='form-control js-relic-name' type='text' placeholder='relic name'>
+            </div>
+            <div class="select-container">
+                <select class='form-control' id='rg1'>
+                    <option selected disabled hidden>grade</option>
+                    <option value='int'>Intact</option>
+                    <option value='exc'>Exceptional</option>
+                    <option value='fla'>Flawless</option>
+                    <option value='rad'>Radiant</option>
+                </select>
+            </div>
+            <div>
+                <input id='ra1' class='form-check-input' type='checkbox'/><span
+                    class='active-text'> Active</span>
+            </div>
+        </div>
+        <div class='relic-block block2'>
+            <div class="select-container">
+                <select class='form-control' id='rt2'>
+                    <option selected disabled hidden>type</option>
+                    <option value='Lith'>Lith</option>
+                    <option value='Meso'>Meso</option>
+                    <option value='Neo'>Neo</option>
+                    <option value='Axi'>Axi</option>
+                    <option value='Requiem'>Requiem</option>
+                </select>
+            </div>
+            <div class="select-container">
+                <input id='rn2' class='form-control js-relic-name' type='text' placeholder='relic name'>
+            </div>
+            <div class="select-container">
+                <select class='form-control' id='rg2'>
+                    <option selected disabled hidden>grade</option>
+                    <option value='int'>Intact</option>
+                    <option value='exc'>Exceptional</option>
+                    <option value='fla'>Flawless</option>
+                    <option value='rad'>Radiant</option>
+                </select>
+            </div>
+            <div>
+                <input id='ra2' class='form-check-input' type='checkbox'/><span
+                    class='active-text'> Active</span>
+            </div>
+        </div>
+        <div class='relic-block block3'>
+            <div class="select-container">
+                <select class='form-control' id='rt3'>
+                    <option selected disabled hidden>type</option>
+                    <option value='Lith'>Lith</option>
+                    <option value='Meso'>Meso</option>
+                    <option value='Neo'>Neo</option>
+                    <option value='Axi'>Axi</option>
+                    <option value='Requiem'>Requiem</option>
+                </select>
+            </div>
+            <div class="select-container">
+                <input id='rn3' class='form-control js-relic-name' type='text' placeholder='relic name'>
+            </div>
+            <div class="select-container">
+                <select class='form-control' id='rg3'>
+                    <option selected disabled hidden>grade</option>
+                    <option value='int'>Intact</option>
+                    <option value='exc'>Exceptional</option>
+                    <option value='fla'>Flawless</option>
+                    <option value='rad'>Radiant</option>
+                </select>
+            </div>
+            <div>
+                <input id='ra3' class='form-check-input' type='checkbox'/><span
+                    class='active-text'> Active</span>
+            </div>
+        </div>
+        <div class='relic-block block4'>
+            <div class="select-container">
+                <select class='form-control' id='rt4'>
+                    <option selected disabled hidden>type</option>
+                    <option value='Lith'>Lith</option>
+                    <option value='Meso'>Meso</option>
+                    <option value='Neo'>Neo</option>
+                    <option value='Axi'>Axi</option>
+                    <option value='Requiem'>Requiem</option>
+                </select>
+            </div>
+            <div class="select-container">
+                <input id='rn4' class='form-control js-relic-name' type='text' placeholder='relic name'/>
+            </div>
+            <div class="select-container">
+                <select class='form-control' id='rg4'>
+                    <option selected disabled hidden>grade</option>
+                    <option value='int'>Intact</option>
+                    <option value='exc'>Exceptional</option>
+                    <option value='fla'>Flawless</option>
+                    <option value='rad'>Radiant</option>
+                </select>
+            </div>
+            <div>
+                <input id='ra4' class='form-check-input' type='checkbox'/><span
+                    class='active-text'> Active</span>
+            </div>
+        </div>
+        <div class="team-block-border"></div>
+        <div class="team-block-label">
+            <span>Squad size</span>
+        </div>
+        <div class='team-block radio-container'>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="team-size" id="team-size1" value="1" checked>
+                <label class="form-check-label" for="team-size1">1</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="team-size" id="team-size2" value="2">
+                <label class="form-check-label" for="team-size2">2</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="team-size" id="team-size3" value="3">
+                <label class="form-check-label" for="team-size3">3</label>
+            </div>
+        </div>
+        <div class="save-relic-block row">
+            <div class="col-xs-12 col-md-6">
+                <button type="button" class="btn btn-primary save-button" onClick="saveRelics()">Save Relics</button>
+            </div>
+            <div class="col-xs-12 col-md-6">
+                <button type="button" class="btn btn-danger save-button" onClick="forgetRelics()">Forget</button>
+            </div>
+        </div>
+        <div class='submit-block'>
+            <button type="button" class="btn btn-dark spam-button js-button">Copy generated text</button>
+        </div>
+        <div class='noti-block'>
+            <span id='noti-text'></span>
+        </div>
+    </div>
+</div>
+<div id="settingsCollapseWrapper"  class="collapse collapse-block">
+    <div class="collapse-div">
+        <div class="row p-2">
+            <label class="col-md-2 version-label">Hosting variations:</label>
+            <div class="col-md-4">
+                <input class="form-control" id="hostVersions" value=""/>
+            </div>
+            <label class="col-md-2 version-label">H/LF variations:</label>
+            <div class="col-md-4">
+                <input class="form-control" id="hostlfVersions" value=""/>
+            </div>
+
+        </div>
+        <div class="row p-2">
+            <label class="col-md-2 version-label">Intact variations:</label>
+            <div class="col-md-4">
+                <input class="form-control" id="intVersions" value=""/>
+            </div>
+            <label class="col-md-2 version-label">Exceptional variations:</label>
+            <div class="col-md-4">
+                <input class="form-control" id="excVersions" value=""/>
+            </div>
+        </div>
+        <div class="row p-2">
+            <label class="col-md-2 version-label">Flawless variations:</label>
+            <div class="col-md-4">
+                <input class="form-control" id="flaVersions" value=""/>
+            </div>
+            <label class="col-md-2 version-label">Radiant variations:</label>
+            <div class="col-md-4">
+                <input class="form-control" id="radVersions" value=""/>
+            </div>
+        </div>
+        <div class="row p-2">
+            <label class="col-md-2 version-label">Ending variations:</label>
+            <div class="col-md-4">
+                <input class="form-control" id="endVersions" value=""/>
+            </div>
+            <div class="col-xs-12 col-md-2 offset-md-2">
+                <button type="button" class="btn btn-danger save-button" onClick="resetVersions()">Restore default</button>
+            </div>
+            <div class="col-xs-12 col-md-2 ">
+                <button type="button" class="btn btn-primary save-button" onClick="saveVersions()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="infoCollapseWrapper"  class="collapse collapse-block">
+    <div class="collapse-div">
+        <h4>What is this?</h4>
+        <p>This is a tool that generates messages, which you can paste in the Warframe recruiting chat for relic sharing. The tool will automatically copy the text to your clipboard, and it will change your message
+            slightly after every button press. This will prevent the in-game chat duplicate detection blocking your message, so you can even post every 5 seconds if you want 
+			(randomization is limited, so mindless spamming won't work in the long run). You can customize the text variations in the options, and your browser will remember these when saved.</p>
+        <h4>How to use?</h4>
+        <p><b>Relic message generation:</b><br/>
+            Use the dropdown and text inputs to set your relics (maximum 4 in a single message), check the active box, and select your current squad size. Press the "Copy spam text" button to generate a new message.
+            Use the "Active" checkboxes to easily remove or add back specific relics to your message on the fly. The relics' grade text and the start/end of the message will automatically change to avoid
+            duplicate detection, you can customize these values in the settings. The algorithm will re-use previous messages when their duplicate prevention timer expires. You can save your input in
+            your browser's storage if you want them to stay there next time you open this page. You don't have to save them every time to generate text, it's only an optional feature.<br/>
+        <b>Customization:</b><br/>
+            Open the settings (gear icon) to customize the relic grade, the starting and the ending alternatives. The variations should be separated with a ; character.
+            You can have as many and as long variations as you like. Don't use semicolon if you have one single value! Empty fields are valid too, if you don't want anything at the end of your message, for example.
+            Press the save button to update the algorithm and save your custom text. This information is stored in your browser locally, so you don't have to edit them every time you re-open the page.
+            If something goes wrong while editing these, you can always press the 'Restore default' button to reset and save all input fields. The order of variations is fixed, the algorithm changes
+            the relic grade texts first, then the start of the message, and lastly the custom ending. The H/LF version is used when the squad size is 1. You can change these to only 'looking for'
+            versions if you want to.</p>
+		<h4>Isn't this against the TOS?</h4>
+        <p>Nope. If pasting text from your clipboard into the in-game chat window is allowed, then using this site should be as well. It has nothing to do with the game, it doesn't interact with your client in any way, 
+		it just generates some text and copies the result, the same way you would do with Ctrl + C .</p>
+    </div>
+</div>
+</body>
+<script>
+    //indexedDB stuff
+    const DB_NAME = 'relic_names';
+    const DB_VERSION = 4; //random number tho
+    const DB_VERSION_STORE = 'versionData';
+    const DB_RELIC_STORE = 'relicData';
+    const INDEXED_DB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
+    const request = INDEXED_DB.open(DB_NAME, DB_VERSION);
+    var db;
+
+    var messageVariations = {};
+
+    request.onerror = function (evt) {
+        console.error("Error openDb:", evt.target.error);
+    };
+    request.onupgradeneeded = function () {
+        db = request.result;
+        if (!db.objectStoreNames.contains(DB_VERSION_STORE)) {
+            db.createObjectStore(DB_VERSION_STORE, {keyPath: 'id'});
+        }
+        if (!db.objectStoreNames.contains(DB_RELIC_STORE)) {
+            db.createObjectStore(DB_RELIC_STORE, {keyPath: 'id'});
+        }
+    };
+    request.onsuccess = function () {
+        db = request.result;
+        let objectStore = db.transaction(DB_VERSION_STORE, "readwrite").objectStore(DB_VERSION_STORE);
+        for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
+            setupVersionData(objectStore, key);
+        }
+        let objectStore2 = db.transaction(DB_RELIC_STORE, "readwrite").objectStore(DB_RELIC_STORE);
+        for (let i of [1, 2, 3, 4]) {
+            for (const idString of ['rt', 'rn', 'rg']) {
+                setupRelicData(objectStore2, '#' + idString + i);
+            }
+        }
+    }
+
+    function setupVersionData(objectStore, key) {
+        let getRow = objectStore.get(key);
+        getRow.onsuccess = function () {
+            //restore / setup default values, if nothing found.
+            if (!getRow.result) {
+                objectStore.put({id: key, versions: DEFAULT_VERSION_TEXTS[key]});
+            }
+            //fill edit input fields and main variable from saved.
+            readDB(DB_VERSION_STORE, key, function (stuff) {
+                document.querySelector('#' + key + 'Versions').value = stuff;
+                messageVariations[key] = convertTextToArray(stuff);
+            });
+        };
+    }
+    function setupRelicData(objectStore, key) {
+        let getRow = objectStore.get(key);
+        getRow.onsuccess = function () {
+            readDB(DB_RELIC_STORE, key, function (stuff) {
+                if (stuff !== 'type' && stuff !== 'grade' && stuff !== '') {
+                    document.querySelector(key).dispatchEvent(new Event('change'));
+                    document.querySelector(key).value = stuff;
+                }
+            });
+        };
+    }
+
+    function writeDB(store, key, list, callback = null) {
+        let request = db.transaction([store], 'readwrite')
+            .objectStore(store)
+            .put({id: key, versions: list});
+
+        request.onerror = function () {
+            console.error('Write failed');
+        }
+        request.onsuccess = function () {
+            if (typeof callback === 'function') {
+                callback();
+            }
+        };
+    }
+
+    function readDB(store, key, callback = null) {
+        let request = db.transaction([store])
+            .objectStore(store)
+            .get(key);
+        request.onerror = function () {
+            console.error('Read failed');
+        };
+        request.onsuccess = function () {
+            if (request.result) {
+                if (typeof callback === 'function') {
+                    callback(request.result.versions);
+                } else {
+                    return request.result.versions;
+                }
+            } else {
+                //console.error('No data record');
+            }
+        };
+    }
+
+    function clearDB(store) {
+        let storeo = db.transaction([store], 'readwrite')
+            .objectStore(store);
+        let req = storeo.clear();
+        req.onerror = function (evt) {
+            console.error('delete failed: ', evt.target.error);
+        };
+    }
+
+    function saveVersions() {
+        for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
+            let text = document.querySelector('#' + key + 'Versions').value;
+            let customArray = convertTextToArray(text);
+            if (!validateCustomArray(customArray)) {
+                return;
+            }
+            messageVariations[key] = customArray;
+            writeDB(DB_VERSION_STORE, key, text);
+        }
+        noti('Variations saved', 1000);
+    }
+
+    function saveRelics() {
+        for (let i of [1, 2, 3, 4]) {
+            for (const idString of ['rt', 'rn', 'rg']) {
+                let val = document.querySelector('#' + idString + i).value;
+                writeDB(DB_RELIC_STORE, '#' + idString + i, val);
+            }
+        }
+        noti('Relics saved', 1000);
+    }
+
+    function validateCustomArray(customArray) {
+        let lowerText = customArray.map(s => s.toLowerCase());
+        let noSpecials = lowerText.map(s => s.replace(/[^a-zA-Z0-9]*/g, ''));
+        let noRepeat = noSpecials.map(s => s.replace(/(.)\1+/g, '$1'));
+        let duplicates = noRepeat.filter((item, index) => index !== noRepeat.indexOf(item));
+        if (duplicates.length > 0) {
+            noti('Duplicate entries found: [' + duplicates.join('], [') + '] in "' + customArray.join(' ; ') + '". (The game\'s repeat detection ignores upper/lowercase characters, ' +
+                'special characters and repeated characters!) Save failed.', 30000, ERROR_COLOR);
+            return false;
+        }
+        return true;
+    }
+
+    function resetVersions() {
+        for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
+            document.querySelector('#' + key + 'Versions').value = value;
+            messageVariations[key] = convertTextToArray(value);
+            writeDB(DB_VERSION_STORE, key, value);
+        }
+        noti('Variations saved', 1000);
+    }
+
+    function forgetRelics() {
+        for (let i of [1, 2, 3, 4]) {
+            for (const idString of ['rt', 'rn', 'rg']) {
+                clearDB(DB_RELIC_STORE);
+            }
+        }
+        noti('Saved relics removed. Inputs reset to empty after a page reload.', 5000);
+    }
+
+    function convertTextToArray(text) {
+        let temp = text.split(';');
+        temp = temp.map(s => s.trim());
+        return temp;
+    }
+
+    //Basic logic and frontend updates
+    var blockedTexts = [];
+    const ERROR_COLOR = '#ff2a2a';
+    const DEFAULT_VERSION_TEXTS = {
+        host: "H; Host; Hosting",
+        hostlf: "H/LF; Host/LF; Hosting/LF",
+        int: "int; intshare; intact; intacts; intact share",
+        exc: "exc; exceptional; exc share; exceptional share",
+        fla: "fla; flawless; fla share; flawless share",
+        rad: "rad; radshare; radiant; rads; radiant share",
+        end: " ; pls; anyone?",
+    }
+    const LOOP_ORDER = ['grade3', 'grade2', 'grade1', 'grade0', 'start', 'end'];
+
+    window.onload = () => {
+        document.querySelector('#settingsCollapseWrapper').addEventListener('hide.bs.collapse', function () {
+            document.querySelector('.settings-button-holder a').style.color = '#fff'
+        })
+        document.querySelector('#settingsCollapseWrapper').addEventListener('show.bs.collapse', function () {
+            document.querySelector('.settings-button-holder a').style.color = '#0d6efd';
+        })
+        document.querySelector('#infoCollapseWrapper').addEventListener('hide.bs.collapse', function () {
+            document.querySelector('.info-button-holder a').style.color = '#fff'
+        })
+        document.querySelector('#infoCollapseWrapper').addEventListener('show.bs.collapse', function () {
+            document.querySelector('.info-button-holder a').style.color = '#0d6efd';
+        })
+        document.querySelectorAll('.grid-container select').forEach(item => {
+            item.addEventListener('change', event => {
+                event.target.style.fontWeight = 'bold';
+                event.target.style.color = '#000';
+            })
+        });
+        document.querySelector('.js-button').addEventListener('click', startCopy);
+        document.querySelectorAll('.form-check-input').forEach(item => {
+            if (item.getAttribute("type") === 'checkbox') {
+                item.addEventListener('click', recolorRow);
+            }
+        });
+        document.querySelectorAll('.js-relic-name').forEach(item => {
+            item.addEventListener('change', relicNameToUpper);
+        });
+        document.querySelectorAll('.active-text').forEach(item => {
+            item.parentElement.addEventListener('click', clickCheck);
+            return false;
+        });
+    };
+
+    function copyTextToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.style.position = 'fixed';
+        textArea.style.top = '0';
+        textArea.style.left = '0';
+        textArea.style.width = '2em';
+        textArea.style.height = '2em';
+        textArea.style.padding = '0';
+        textArea.style.border = 'none';
+        textArea.style.outline = 'none';
+        textArea.style.boxShadow = 'none';
+        textArea.style.background = 'transparent';
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+        } catch (err) {
+            console.error('Unable to copy');
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function unblockVariation(text) {
+        for (let [index, blockedText] of blockedTexts.entries()) {
+            if (blockedText === text) {
+                blockedTexts.splice(index, 1);
+                break;
+            }
+        }
+    }
+    function isValidVariation(text) {
+        for (let blockedText of blockedTexts) {
+            if (blockedText === text) {
+                return false;
+            }
+        }
+        return true;
+    }
+    function blockVariation(text) {
+        blockedTexts.push(text);
+        window.setTimeout(unblockVariation, 125000, text);
+    }
+    function getValidVariation(dummyText, skeleton) {
+        let tryThis = iterateString(dummyText, skeleton); //recursive magic!
+        if (tryThis !== '' && isValidVariation(tryThis)) {
+            blockVariation(tryThis);
+            return tryThis;
+        }
+        return '';
+    }
+
+    function iterateString(string, skeleton) {
+        //if the insert by the current 'skeleton' is valid, return with that.
+        let dataToInsert = {};
+        for (let [key, dataObj] of Object.entries(skeleton)) {
+            dataToInsert[key] =  messageVariations[dataObj.name][dataObj.num];
+        }
+        let firstTry = doTheReplace(string, dataToInsert);
+        if (isValidVariation(firstTry)) {
+            return firstTry;
+        }
+
+        //if not, search which attribute to change
+        let nextLoopedAttr = '';
+        for (let key of LOOP_ORDER) {
+            if (skeleton.hasOwnProperty(key)) {
+                if (skeleton[key].num < messageVariations[skeleton[key].name].length - 1) {
+                    //found something to change
+                    nextLoopedAttr = key;
+                    break;
+                } else {
+                    //if this was out last attribute, we can't do sh*t.
+                    if (key === LOOP_ORDER[LOOP_ORDER.length - 1]) {
+                        return '';
+                    }
+                    //if we can change something later, the current number goes back to 0 and starts growing during next recursion.
+                    skeleton[key].num = 0;
+                }
+            }
+        }
+        //if nothing to change
+        if (nextLoopedAttr === '') {
+            return '';
+        }
+        //set the thing to change next iteration, and do a good ol' recursiev call.
+        skeleton[nextLoopedAttr].num += 1;
+        return iterateString(string, skeleton);
+    }
+    function doTheReplace(string, data) {
+        for (let [key, text] of Object.entries(data)) {
+            string = string.replace('%' + key + '%', text);
+        }
+        return string;
+    }
+
+    var fadeStartTimer;
+    var fadeTimer;
+    function noti(text, timeout = 15000, color = '#fff') {
+        let noti = document.querySelector('#noti-text');
+        clearInterval(fadeTimer);
+        clearInterval(fadeStartTimer);
+        noti.style.opacity = '1';
+        noti.style.display = 'block';
+        noti.style.color = color;
+        noti.innerText = text;
+        fadeStartTimer = window.setTimeout(function () {
+            fadeElement(document.querySelector('#noti-text'));
+        }, timeout);
+    }
+
+    function fadeElement(element) {
+        let op = 1;  // initial opacity
+        fadeTimer = setInterval(function () {
+            if (op <= 0.01) {
+                clearInterval(fadeTimer);
+                element.style.display = 'none';
+            }
+            element.style.opacity = op;
+            element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+            op -= 0.05;
+        }, 100);
+    }
+
+    function startCopy () {
+        let relics = [];
+        for (let i = 1; i <= 4; i++) {
+            let rt = document.querySelector('#rt' + i);
+            let rn = document.querySelector('#rn' + i);
+            let rg = document.querySelector('#rg' + i);
+            let ra = document.querySelector('#ra' + i);
+            if (ra.checked) {
+                if (rt.value !== 'Relic type' && rn.value !== '' && rg.value !== 'Relic grade') {
+                    let relic1 = {
+                        'type': rt.value,
+                        'name': rn.value,
+                        'grade': rg.options[rg.selectedIndex].value
+                    }
+                    relics.push(relic1);
+                }
+            }
+        }
+        let teamSize = document.querySelector('input[name="team-size"]:checked').value;
+        if (relics.length === 0) {
+            noti('No valid or active relic detected! Nothing to copy.', 2000, ERROR_COLOR);
+            return;
+        }
+        if (teamSize === '') {
+            noti('Set the squad size!', 2000, ERROR_COLOR);
+            return;
+        }
+
+        let copyText = generateSpamText(teamSize, relics);
+        if (copyText === '') {
+            noti('No available message variations, please wait or add new alternatives in the options menu!', 8000, ERROR_COLOR);
+            return;
+        }
+        noti('Copied: ' + copyText);
+        copyTextToClipboard(copyText);
+    }
+
+    function recolorRow(event) {
+        const row = this.closest('.relic-block');
+        row.classList.toggle('active');
+        if (event.stopPropagation) {
+            event.stopPropagation();
+        } else {
+            event.cancelBubble = true;
+        }
+    }
+
+    function relicNameToUpper() {
+        this.value = this.value.toUpperCase();
+    }
+
+    function clickCheck() {
+        const input = this.querySelector('input');
+        input.checked = !input.checked;
+        input.dispatchEvent(new Event('click'));
+    }
+
+    function generateSpamText(teamSize, relics) {
+        let skeleton = {};
+        /* the skeleton is a data structure like this:
+        {
+            start: {name: 'host', num: 0},
+            grade0: {name: 'rad', num: 0},
+            ...
+        }
+        It helps us identify which string to replace using which options, and the num parameter is there to remember which of the versions are we trying to insert.*/
+
+        let teamSizeText = '';
+        if (teamSize === '1') {
+            skeleton.start = {name: 'hostlf', num: 0};
+        } else {
+            teamSizeText = teamSize + '/4 ';
+            skeleton.start = {name: 'host', num: 0};
+        }
+        let gradeVariationText = '';
+
+        //get dummy text
+        let copyText = '%start% ';
+        for (let [index, relic] of relics.entries()) {
+            gradeVariationText = '%grade' + index + '%';
+            copyText += '[' + relic.type + ' ' + relic.name + ' Relic] ' + gradeVariationText + ' ';
+            skeleton['grade' + index] = {name: relic.grade, num: 0};
+        }
+        copyText += teamSizeText + '%end%';
+        skeleton.end = {name: 'end', num: 0};
+
+        //generate valid version or die trying!!!
+        return getValidVariation(copyText, skeleton);
+    }
+</script>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Warframe relic message generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="./scripts.js" defer></script>
+</head>
+<body>
+<nav>
+    <img src="./assets/Warframe.svg" alt="">
+    <span class="title">Warframe tools</span>
+    <a class="nav-item" href="./relics">Relic chat generator</a>
+    <a class="nav-item active" href="./weekly">Weekly limited tasks</a>
+</nav>
+<div class="title-row">
+    <a data-bs-toggle="collapse" class="collapsed" href="#infoCollapseWrapper">
+        <i class="bi-info-circle"></i>
+    </a>
+    <span>Relic Message Generator</span>
+    <a data-bs-toggle="collapse" class="collapsed" href="#settingsCollapseWrapper">
+        <i class="bi-gear"></i>
+    </a>
+</div>
+
+<div id="settingsCollapseWrapper"  class="collapse collapse-block">
+    <div class="collapse-div">
+        <div class="row p-2">
+            <label class="col-md-2 version-label">Hosting variations:</label>
+            <div class="col-md-4">
+                <input class="form-control" id="hostVersions" value=""/>
+            </div>
+            <label class="col-md-2 version-label">H/LF variations:</label>
+            <div class="col-md-4">
+                <input class="form-control" id="hostlfVersions" value=""/>
+            </div>
+
+        </div>
+        <div class="row p-2">
+            <label class="col-md-2 version-label">Intact variations:</label>
+            <div class="col-md-4">
+                <input class="form-control" id="intVersions" value=""/>
+            </div>
+            <label class="col-md-2 version-label">Exceptional variations:</label>
+            <div class="col-md-4">
+                <input class="form-control" id="excVersions" value=""/>
+            </div>
+        </div>
+        <div class="row p-2">
+            <label class="col-md-2 version-label">Flawless variations:</label>
+            <div class="col-md-4">
+                <input class="form-control" id="flaVersions" value=""/>
+            </div>
+            <label class="col-md-2 version-label">Radiant variations:</label>
+            <div class="col-md-4">
+                <input class="form-control" id="radVersions" value=""/>
+            </div>
+        </div>
+        <div class="row p-2">
+            <label class="col-md-2 version-label">Ending variations:</label>
+            <div class="col-md-4">
+                <input class="form-control" id="endVersions" value=""/>
+            </div>
+            <div class="col-xs-12 col-md-2 offset-md-2">
+                <button type="button" class="btn btn-danger save-button" onClick="resetVersions()">Restore default</button>
+            </div>
+            <div class="col-xs-12 col-md-2 ">
+                <button type="button" class="btn btn-primary save-button" onClick="saveVersions()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="infoCollapseWrapper"  class="collapse collapse-block">
+    <div class="collapse-div">
+        <h4>What is this?</h4>
+        <p>This is a tool that generates messages, which you can paste in the Warframe recruiting chat for relic sharing. The tool will automatically copy the text to your clipboard, and it will change your message
+            slightly after every button press. This will prevent the in-game chat duplicate detection blocking your message, so you can even post your message every 5 seconds if needed.
+			(randomization is limited, so reckless chat spamming won't work). It makes updating your message a lot easier, for example if you invite someone, you can modify the squad size input,
+            and get your updated message with a button click. You can customize the text variations in the options, and your browser will remember these when saved.</p>
+        <h4>How to use?</h4>
+        <p><b>Relic message generation:</b><br/>
+            Use the dropdown and text inputs to set your relics (maximum 4 in a single message), check the active box, and select your current squad size. Press the "Copy spam text" button to generate a new message.
+            Use the "Active" checkboxes to easily remove or add back specific relics to your message on the fly. The relics' grade text and the start/end of the message will automatically change to avoid
+            duplicate detection, you can customize these values in the settings. The algorithm will re-use previous messages when their duplicate prevention timer expires. You can save your input in
+            your browser's storage if you want them to stay there next time you open this page. You don't have to save them every time to generate text, it's only an optional feature.<br/>
+        <b>Customization:</b><br/>
+            Open the settings (gear icon) to customize the relic grade, the starting and the ending alternatives. The variations should be separated with a ; character.
+            You can have as many and as long variations as you like. Don't use semicolon if you have one single value, because an empty string is a valid variation!
+            (The default setting of ending texts starts with a semicolon, indicating that the first thing it uses as the ending is an empty string.) Empty input fields are valid too,
+            if you don't want to add anything at the end of your message, for example.
+            Press the save button to update the algorithm and save your custom text. This information is stored in your browser locally, so you don't have to edit them every time you re-open the page.
+            If something goes wrong while editing these, you can always press the 'Restore default' button to reset and save all input fields. The order of variations is fixed, the algorithm changes
+            the relic grade texts first, then the start of the message, and lastly the custom ending. The H/LF version is used when the squad size is 1. You can overwrite these texts to 'looking for'
+            variations if you want to.</p>
+		<h4>Isn't this against the TOS?</h4>
+        <p>Nope. If pasting text from your clipboard into the in-game chat window is allowed, then using this site should be as well. It has nothing to do with the game, it doesn't interact with your client in any way, 
+		it just generates some text and copies the result, the same way you would do with Ctrl + C .</p>
+    </div>
+</div>
+</body>
+</html>

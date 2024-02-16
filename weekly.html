@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Warframe relic message generator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="./style.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="./scripts.js" defer></script>
@@ -13,19 +15,42 @@
 <nav>
     <img src="./assets/Warframe.svg" alt="">
     <span class="title">Warframe tools</span>
-    <a class="nav-item" href="./relics">Relic chat generator</a>
-    <a class="nav-item active" href="./weekly">Weekly limited tasks</a>
+    <div class="site-nav">
+        <a class="nav-item" href="./relics">Relic chat generator</a>
+        <a class="nav-item active" href="./weekly">Weekly limited tasks</a>
+    </div>
 </nav>
 <div class="title-row">
     <a data-bs-toggle="collapse" class="collapsed" href="#infoCollapseWrapper">
         <i class="bi-info-circle"></i>
     </a>
-    <span>Relic Message Generator</span>
+    <span>Weekly task reminder</span>
     <a data-bs-toggle="collapse" class="collapsed" href="#settingsCollapseWrapper">
         <i class="bi-gear"></i>
     </a>
 </div>
-
+<div class='main-div'>
+    <div class="task-type-nav">
+        <button class="nav-item active" aria-controls="active-container" onClick="openSubmenu(this);">Active</button>
+        <button class="nav-item" aria-controls="finished-container" onClick="openSubmenu(this);">Finished</button>
+        <button class="nav-item" aria-controls="disabled-container" onClick="openSubmenu(this);">Disabled</button>
+    </div>
+    <div id="active-container" class="todo-list-container">
+        <div class="todo-list-item">Archon hunt</div>
+        <div class="todo-list-item">Netracells</div>
+        <div class="todo-list-item">Khal mission</div>
+    </div>
+    <div id="finished-container" class="todo-list-container d-none">
+        <div class="todo-list-item">Archon hunt</div>
+        <div class="todo-list-item">Netracells</div>
+        <div class="todo-list-item">Khal mission</div>
+    </div>
+    <div id="disabled-container" class="todo-list-container d-none">
+        <div class="todo-list-item">Archon hunt</div>
+        <div class="todo-list-item">Netracells</div>
+        <div class="todo-list-item">Khal mission</div>
+    </div>
+</div>
 <div id="settingsCollapseWrapper"  class="collapse collapse-block">
     <div class="collapse-div">
         <div class="row p-2">

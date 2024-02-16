@@ -198,7 +198,10 @@ window.onload = () => {
             event.target.style.color = '#000';
         })
     });
-    document.querySelector('.js-button').addEventListener('click', startCopy);
+    let copyButton = document.querySelector('.js-button');
+    if (copyButton) {
+        copyButton.addEventListener('click', startCopy);
+    }
     document.querySelectorAll('.form-check-input').forEach(item => {
         if (item.getAttribute("type") === 'checkbox') {
             item.addEventListener('click', recolorRow);
@@ -426,4 +429,15 @@ function generateSpamText(teamSize, relics) {
 
     //generate valid version or die trying!!!
     return getValidVariation(copyText, skeleton);
+}
+
+function openSubmenu(buttonElement) {
+    let divId = buttonElement.getAttribute('aria-controls');
+    document.querySelectorAll('.todo-list-container').forEach(item => {
+        if (item.id === divId) {
+            item.classList.remove('d-none');
+        } else {
+            item.classList.add('d-none');
+        }
+    });
 }

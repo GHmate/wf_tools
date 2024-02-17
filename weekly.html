@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="./scripts.js" defer></script>
 </head>
-<body>
+<body data-site="weekly">
 <nav>
     <img src="./assets/Warframe.svg" alt="">
     <span class="title">Warframe tools</span>
@@ -31,24 +31,54 @@
 </div>
 <div class='main-div'>
     <div class="task-type-nav">
-        <button class="nav-item active" aria-controls="active-container" onClick="openSubmenu(this);">Active</button>
-        <button class="nav-item" aria-controls="finished-container" onClick="openSubmenu(this);">Finished</button>
-        <button class="nav-item" aria-controls="disabled-container" onClick="openSubmenu(this);">Disabled</button>
+        <button class="nav-item active" aria-controls="active-container" onClick="openSubmenu(this);">Active (2)</button>
+        <button class="nav-item" aria-controls="finished-container" onClick="openSubmenu(this);">Finished (2)</button>
+        <button class="nav-item" aria-controls="disabled-container" onClick="openSubmenu(this);">Disabled (1)</button>
     </div>
     <div id="active-container" class="todo-list-container">
-        <div class="todo-list-item">Archon hunt</div>
-        <div class="todo-list-item">Netracells</div>
-        <div class="todo-list-item">Khal mission</div>
+        <div class="todo-list-item" id="archon_hunt">
+            <div class="title">Archon hunt</div>
+            <div class="info">
+                <i class="bi-info-circle"></i>
+            </div>
+            <i class="bi-check-circle"></i>
+            <i class="bi-dash-circle-dotted"></i>
+        </div>
+        <div class="todo-list-item" id="netracells">
+            <div class="title">Netracells</div>
+            <div class="info">
+                <i class="bi-info-circle"></i>
+            </div>
+            <i class="bi-check-circle"></i>
+            <i class="bi-dash-circle-dotted"></i>
+        </div>
     </div>
     <div id="finished-container" class="todo-list-container d-none">
-        <div class="todo-list-item">Archon hunt</div>
-        <div class="todo-list-item">Netracells</div>
-        <div class="todo-list-item">Khal mission</div>
+        <div class="todo-list-item" id="khal_missions">
+            <div class="title">Khal mission</div>
+            <div class="info">
+                <i class="bi-info-circle"></i>
+            </div>
+            <i class="bi-x-circle"></i>
+            <i class="bi-dash-circle-dotted"></i>
+        </div>
+        <div class="todo-list-item" id="palladino_shop">
+            <div class="title">Palladino shop</div>
+            <div class="info">
+                <i class="bi-info-circle"></i>
+            </div>
+            <i class="bi-x-circle"></i>
+            <i class="bi-dash-circle-dotted"></i>
+        </div>
     </div>
     <div id="disabled-container" class="todo-list-container d-none">
-        <div class="todo-list-item">Archon hunt</div>
-        <div class="todo-list-item">Netracells</div>
-        <div class="todo-list-item">Khal mission</div>
+        <div class="todo-list-item" id="acrithis_shop">
+            <div class="title">Acrithis shop</div>
+            <div class="info">
+                <i class="bi-info-circle"></i>
+            </div>
+            <i class="bi-arrow-left-circle"></i>
+        </div>
     </div>
 </div>
 <div id="settingsCollapseWrapper"  class="collapse collapse-block">

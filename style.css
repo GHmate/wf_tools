@@ -295,9 +295,36 @@ a:hover {
     color: white;
     font-size: 18px;
     border-radius: 10px;
+    display: flex;
+    gap: min(4%, 22px);
+    align-items: center;
 }
+.todo-list-item > .info {
+    flex-grow: 1;
+}
+.todo-list-item > input {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+.todo-list-item i {
+    font-size: 22px;
+    line-height: 17px;
+    cursor: pointer;
+}
+
 #active-container .todo-list-item {
     background-color: #365b91;
+    border: #0a0a0a solid 1px;
+    padding: 10px 15px;
+}
+#finished-container .todo-list-item {
+    background-color: #346737;
+    border: #0a0a0a solid 1px;
+    padding: 10px 15px;
+}
+#disabled-container .todo-list-item {
+    background-color: #595959;
     border: #0a0a0a solid 1px;
     padding: 10px 15px;
 }

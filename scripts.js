@@ -1,39 +1,10 @@
-//indexedDB stuff
-const DB_NAME = 'relic_names';
-const DB_VERSION = 4; //random number tho
+const DB_VERSION = 4; //random number
+const INDEXED_DB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
 const DB_VERSION_STORE = 'versionData';
 const DB_RELIC_STORE = 'relicData';
-const INDEXED_DB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
-const request = INDEXED_DB.open(DB_NAME, DB_VERSION);
-let db;
 
+let db; //indexedDB
 let messageVariations = {};
-
-request.onerror = function (evt) {
-    console.error("Error openDb:", evt.target.error);
-};
-request.onupgradeneeded = function () {
-    db = request.result;
-    if (!db.objectStoreNames.contains(DB_VERSION_STORE)) {
-        db.createObjectStore(DB_VERSION_STORE, {keyPath: 'id'});
-    }
-    if (!db.objectStoreNames.contains(DB_RELIC_STORE)) {
-        db.createObjectStore(DB_RELIC_STORE, {keyPath: 'id'});
-    }
-};
-request.onsuccess = function () {
-    db = request.result;
-    let objectStore = db.transaction(DB_VERSION_STORE, "readwrite").objectStore(DB_VERSION_STORE);
-    for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
-        setupVersionData(objectStore, key);
-    }
-    let objectStore2 = db.transaction(DB_RELIC_STORE, "readwrite").objectStore(DB_RELIC_STORE);
-    for (let i of [1, 2, 3, 4]) {
-        for (const idString of ['rt', 'rn', 'rg']) {
-            setupRelicData(objectStore2, '#' + idString + i);
-        }
-    }
-}
 
 function setupVersionData(objectStore, key) {
     let getRow = objectStore.get(key);
@@ -180,6 +151,16 @@ const DEFAULT_VERSION_TEXTS = {
 const LOOP_ORDER = ['grade3', 'grade2', 'grade1', 'grade0', 'start', 'end'];
 
 window.onload = () => {
+    const site = document.body.dataset.site;
+    switch (site) {
+        case 'relics':
+            onloadRelics();
+            break;
+        case 'weekly':
+            onloadWeeklies();
+            break;
+    }
+
     document.querySelector('#settingsCollapseWrapper').addEventListener('hide.bs.collapse', function () {
         document.querySelector('.settings-button-holder a').style.color = '#fff'
     })
@@ -192,6 +173,10 @@ window.onload = () => {
     document.querySelector('#infoCollapseWrapper').addEventListener('show.bs.collapse', function () {
         document.querySelector('.info-button-holder a').style.color = '#0d6efd';
     })
+};
+
+function onloadRelics() {
+    initIndexedDBRelics();
     document.querySelectorAll('.grid-container select').forEach(item => {
         item.addEventListener('change', event => {
             event.target.style.fontWeight = 'bold';
@@ -214,7 +199,69 @@ window.onload = () => {
         item.parentElement.addEventListener('click', clickCheck);
         return false;
     });
-};
+}
+function onloadWeeklies() {
+    initIndexedDBWeeklies();
+}
+
+function initIndexedDBRelics() {
+    const request = INDEXED_DB.open('relic_names', DB_VERSION);
+
+    request.onerror = function (evt) {
+        console.error("Error openDb:", evt.target.error);
+    };
+    request.onupgradeneeded = function () {
+        db = request.result;
+        if (!db.objectStoreNames.contains(DB_VERSION_STORE)) {
+            db.createObjectStore(DB_VERSION_STORE, {keyPath: 'id'});
+        }
+        if (!db.objectStoreNames.contains(DB_RELIC_STORE)) {
+            db.createObjectStore(DB_RELIC_STORE, {keyPath: 'id'});
+        }
+    };
+    request.onsuccess = function () {
+        db = request.result;
+        let objectStore = db.transaction(DB_VERSION_STORE, "readwrite").objectStore(DB_VERSION_STORE);
+        for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
+            setupVersionData(objectStore, key);
+        }
+        let objectStore2 = db.transaction(DB_RELIC_STORE, "readwrite").objectStore(DB_RELIC_STORE);
+        for (let i of [1, 2, 3, 4]) {
+            for (const idString of ['rt', 'rn', 'rg']) {
+                setupRelicData(objectStore2, '#' + idString + i);
+            }
+        }
+    }
+}
+function initIndexedDBWeeklies() {
+    const request = INDEXED_DB.open('weeklies', DB_VERSION + 1);
+
+    request.onerror = function (evt) {
+        console.error("Error openDb:", evt.target.error);
+    };
+    request.onupgradeneeded = function () {
+        db = request.result;
+        if (!db.objectStoreNames.contains(DB_VERSION_STORE)) {
+            db.createObjectStore(DB_VERSION_STORE, {keyPath: 'id'});
+        }
+        if (!db.objectStoreNames.contains(DB_RELIC_STORE)) {
+            db.createObjectStore(DB_RELIC_STORE, {keyPath: 'id'});
+        }
+    };
+    request.onsuccess = function () {
+        db = request.result;
+        let objectStore = db.transaction(DB_VERSION_STORE, "readwrite").objectStore(DB_VERSION_STORE);
+        for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
+            setupVersionData(objectStore, key);
+        }
+        let objectStore2 = db.transaction(DB_RELIC_STORE, "readwrite").objectStore(DB_RELIC_STORE);
+        for (let i of [1, 2, 3, 4]) {
+            for (const idString of ['rt', 'rn', 'rg']) {
+                setupRelicData(objectStore2, '#' + idString + i);
+            }
+        }
+    }
+}
 
 function copyTextToClipboard(text) {
     const textArea = document.createElement("textarea");
@@ -440,4 +487,8 @@ function openSubmenu(buttonElement) {
             item.classList.add('d-none');
         }
     });
+    document.querySelectorAll('.task-type-nav>.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    buttonElement.classList.add('active');
 }

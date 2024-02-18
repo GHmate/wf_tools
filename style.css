@@ -101,12 +101,14 @@ nav > .site-nav {
     background-color: #444444;
     color: #ffffff;
     margin-inline: CALC(2% + 20px);
-    margin-bottom: 20px;
     border-radius: 10px;
     padding: 18px;
 }
 h4 {
     margin: 20px 0 10px 0;
+}
+h4:nth-child(1) {
+    margin-top: 0;
 }
 .collapse-div {
     background-color: #444444;
@@ -115,7 +117,8 @@ h4 {
     padding: 18px;
 }
 .collapse-block {
-    margin: CALC(2% + 20px);
+    margin-inline: CALC(2% + 20px);
+    margin-top: 20px;
 }
 .grid-container {
     width: auto;
@@ -138,6 +141,9 @@ h4 {
 
 i {
     cursor: pointer;
+}
+i.yellow {
+    color: #e7e728;
 }
 
 a:hover {
@@ -347,4 +353,20 @@ a:hover {
     align-self: center;
     padding-left: 30px;
     text-align: right;
+}
+
+.custom-container {
+    display: flex;
+    padding-inline: CALC(2% + 20px);
+    margin-top: 20px;
+}
+.custom-container > button {
+    width: fit-content;
+}
+#poiCollapseWrapper > div {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    row-gap: 20px;
+    column-gap: min(4%, 30px);
 }

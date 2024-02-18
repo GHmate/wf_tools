@@ -93,24 +93,12 @@ window.onload = () => {
     switch (site) {
         case 'relics':
             onloadRelics();
+            resetTooltips();
             break;
         case 'weekly':
             initIndexedDBWeeklies();
             break;
     }
-
-    document.querySelector('#settingsCollapseWrapper').addEventListener('hide.bs.collapse', function () {
-        document.querySelector('.settings-button-holder a').style.color = '#fff'
-    })
-    document.querySelector('#settingsCollapseWrapper').addEventListener('show.bs.collapse', function () {
-        document.querySelector('.settings-button-holder a').style.color = '#0d6efd';
-    })
-    document.querySelector('#infoCollapseWrapper').addEventListener('hide.bs.collapse', function () {
-        document.querySelector('.info-button-holder a').style.color = '#fff'
-    })
-    document.querySelector('#infoCollapseWrapper').addEventListener('show.bs.collapse', function () {
-        document.querySelector('.info-button-holder a').style.color = '#0d6efd';
-    })
 };
 
 function setupVersionData() {
@@ -364,6 +352,7 @@ function initIndexedDBWeeklies() {
         updateDataUsingApiData(apiData);
         console.log(apiData);
         updateWeeklyHtml(weekly_data);
+        initPointsOfInterests(apiData);
     }
 }
 function copyTextToClipboard(text) {
@@ -697,4 +686,52 @@ function isOnThisWeek (date, weekStartDateStr) {
     endOfWeek.setDate(endOfWeek.getDate() + 7);
 
     return date >= startOfWeek && date < endOfWeek;
+}
+function removeWeeklySavedData() {
+    clearIndexedDB(DB_WEEKLY_TASKS).then(function f() {
+        alert('Save data removed from the computer.');
+        close();
+    });
+}
+function initPointsOfInterests(apiData) {
+    let poiHtml = '';
+
+    if (apiData.alerts) {
+        for ([key, data] of Object.entries(apiData.alerts)) {
+            if (data.mission.description === 'Gift From The Lotus' && data.active) {
+                poiHtml += `<span>Gift From The Lotus:</span><span>${data.mission.reward.asString}</span><span>${data.mission.node}</span>`;
+            }
+        }
+    }
+    if (apiData.invasions) {
+        for ([key, data] of Object.entries(apiData.invasions)) {
+            let rewardText = getInvasionUsefulRewards(data);
+            if (data.completed === false && rewardText) {
+                poiHtml += `<span>Invasion:</span><span>${rewardText}</span><span>${data.desc}</span>`;
+            }
+        }
+    }
+
+    if (poiHtml) {
+        document.querySelector('[aria-controls="poiCollapseWrapper"]').classList.remove('d-none');
+        document.querySelector('#poiCollapseWrapper > div').innerHTML = poiHtml;
+    }
+}
+function getInvasionUsefulRewards(data) {
+    let result = '';
+    const usefulRewards = ['forma', 'catalyst', 'reactor', 'adapter'];
+    if (data.defenderReward?.asString) {
+        let defender = data.defenderReward.asString.toLowerCase();
+        if (usefulRewards.some(substring => defender.includes(substring))) {
+            result += `${defender}`;
+        }
+    }
+    if (data.attackerReward?.asString) {
+        let attacker = data.attackerReward.asString.toLowerCase();
+        if (usefulRewards.some(substring => attacker.includes(substring))) {
+            result += `${attacker}`;
+        }
+    }
+
+    return result;
 }

@@ -286,7 +286,8 @@ a:hover {
 }
 .todo-list-container {
     margin-top: 40px;
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(600px, 100%), 1fr));
     gap: 10px;
     flex-wrap: wrap;
 }
@@ -299,7 +300,7 @@ a:hover {
     gap: min(4%, 22px);
     align-items: center;
 }
-.todo-list-item > .info {
+.todo-list-item > .title {
     flex-grow: 1;
 }
 .todo-list-item > input {
@@ -318,7 +319,7 @@ a:hover {
     border: #0a0a0a solid 1px;
     padding: 10px 15px;
 }
-#finished-container .todo-list-item {
+#completed-container .todo-list-item {
     background-color: #346737;
     border: #0a0a0a solid 1px;
     padding: 10px 15px;

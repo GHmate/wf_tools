@@ -2,142 +2,14 @@ const DB_VERSION = 4; //random number
 const INDEXED_DB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
 const DB_VERSION_STORE = 'versionData';
 const DB_RELIC_STORE = 'relicData';
+const DB_WEEKLY_TASKS = 'weeklyTasks';
 
 let db; //indexedDB
 let messageVariations = {};
-
-function setupVersionData(objectStore, key) {
-    let getRow = objectStore.get(key);
-    getRow.onsuccess = function () {
-        //restore / setup default values, if nothing found.
-        if (!getRow.result) {
-            objectStore.put({id: key, versions: DEFAULT_VERSION_TEXTS[key]});
-        }
-        //fill edit input fields and main variable from saved.
-        readDB(DB_VERSION_STORE, key, function (stuff) {
-            document.querySelector('#' + key + 'Versions').value = stuff;
-            messageVariations[key] = convertTextToArray(stuff);
-        });
-    };
-}
-function setupRelicData(objectStore, key) {
-    let getRow = objectStore.get(key);
-    getRow.onsuccess = function () {
-        readDB(DB_RELIC_STORE, key, function (stuff) {
-            if (stuff !== 'type' && stuff !== 'grade' && stuff !== '') {
-                document.querySelector(key).dispatchEvent(new Event('change'));
-                document.querySelector(key).value = stuff;
-            }
-        });
-    };
-}
-
-function writeDB(store, key, list, callback = null) {
-    let request = db.transaction([store], 'readwrite')
-        .objectStore(store)
-        .put({id: key, versions: list});
-
-    request.onerror = function () {
-        console.error('Write failed');
-    }
-    request.onsuccess = function () {
-        if (typeof callback === 'function') {
-            callback();
-        }
-    };
-}
-
-function readDB(store, key, callback = null) {
-    let request = db.transaction([store])
-        .objectStore(store)
-        .get(key);
-    request.onerror = function () {
-        console.error('Read failed');
-    };
-    request.onsuccess = function () {
-        if (request.result) {
-            if (typeof callback === 'function') {
-                callback(request.result.versions);
-            } else {
-                return request.result.versions;
-            }
-        } else {
-            //console.error('No data record');
-        }
-    };
-}
-
-function clearDB(store) {
-    let storeObject = db.transaction([store], 'readwrite')
-        .objectStore(store);
-    let req = storeObject.clear();
-    req.onerror = function (evt) {
-        console.error('delete failed: ', evt.target.error);
-    };
-}
-
-function saveVersions() {
-    for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
-        let text = document.querySelector('#' + key + 'Versions').value;
-        let customArray = convertTextToArray(text);
-        if (!validateCustomArray(customArray)) {
-            return;
-        }
-        messageVariations[key] = customArray;
-        writeDB(DB_VERSION_STORE, key, text);
-    }
-    noti('Variations saved', 1000);
-}
-
-function saveRelics() {
-    for (let i of [1, 2, 3, 4]) {
-        for (const idString of ['rt', 'rn', 'rg']) {
-            let val = document.querySelector('#' + idString + i).value;
-            writeDB(DB_RELIC_STORE, '#' + idString + i, val);
-        }
-    }
-    noti('Relics saved', 1000);
-}
-
-function validateCustomArray(customArray) {
-    let lowerText = customArray.map(s => s.toLowerCase());
-    let noSpecials = lowerText.map(s => s.replace(/[^a-zA-Z0-9]*/g, ''));
-    let noRepeat = noSpecials.map(s => s.replace(/(.)\1+/g, '$1'));
-    let duplicates = noRepeat.filter((item, index) => index !== noRepeat.indexOf(item));
-    if (duplicates.length > 0) {
-        noti('Duplicate entries found: [' + duplicates.join('], [') + '] in "' + customArray.join(' ; ') + '". (The game\'s repeat detection ignores upper/lowercase characters, ' +
-            'special characters and repeated characters!) Save failed.', 30000, ERROR_COLOR);
-        return false;
-    }
-    return true;
-}
-
-function resetVersions() {
-    for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
-        document.querySelector('#' + key + 'Versions').value = value;
-        messageVariations[key] = convertTextToArray(value);
-        writeDB(DB_VERSION_STORE, key, value);
-    }
-    noti('Variations saved', 1000);
-}
-
-function forgetRelics() {
-    for (let i of [1, 2, 3, 4]) {
-        for (const idString of ['rt', 'rn', 'rg']) {
-            clearDB(DB_RELIC_STORE);
-        }
-    }
-    noti('Saved relics removed. Inputs reset to empty after a page reload.', 5000);
-}
-
-function convertTextToArray(text) {
-    let temp = text.split(';');
-    temp = temp.map(s => s.trim());
-    return temp;
-}
-
-//Basic logic and frontend updates
-var blockedTexts = [];
+let fadeStartTimer;
+let fadeTimer;
+let blockedTexts = [];
+let weekly_data = {};
 const ERROR_COLOR = '#ff2a2a';
 const DEFAULT_VERSION_TEXTS = {
     host: "H; Host; Hosting",
@@ -149,6 +21,72 @@ const DEFAULT_VERSION_TEXTS = {
     end: " ; pls; anyone?",
 }
 const LOOP_ORDER = ['grade3', 'grade2', 'grade1', 'grade0', 'start', 'end'];
+const DEFAULT_WEEKLIES = {
+    lastWeekTimestamp: '',
+    acrithis_shop: {
+        displayName: 'Acrithis offerings',
+        isCompleted: false,
+        isDisabled: false,
+        info: '',
+        lastChanged: ''
+    },
+    archon_hunt: {
+        displayName: 'Archon hunt',
+        isCompleted: false,
+        isDisabled: false,
+        info: '',
+        lastChanged: ''
+    },
+    baro_kiteer: {
+        displayName: 'Baro Ki\'Teer',
+        isCompleted: false,
+        isDisabled: false,
+        info: '',
+        lastChanged: ''
+    },
+    circuit: {
+        displayName: 'The Circuit',
+        isCompleted: false,
+        isDisabled: false,
+        info: '',
+        lastChanged: ''
+    },
+    kahl_missions: {
+        displayName: 'Kahl\'s mission',
+        isCompleted: false,
+        isDisabled: false,
+        info: '',
+        lastChanged: ''
+    },
+    netracells: {
+        displayName: 'Netracells',
+        isCompleted: false,
+        isDisabled: false,
+        info: '',
+        lastChanged: ''
+    },
+    nightwave_shop: {
+        displayName: 'Nightwave cred offerings',
+        isCompleted: false,
+        isDisabled: false,
+        info: '',
+        lastChanged: ''
+    },
+    palladino_shop: {
+        displayName: 'Palladino shop',
+        isCompleted: false,
+        isDisabled: false,
+        info: '',
+        lastChanged: ''
+    },
+    steel_path_shop: {
+        displayName: 'Steel path shop',
+        isCompleted: false,
+        isDisabled: false,
+        info: '',
+        lastChanged: ''
+    }
+}
 
 window.onload = () => {
     const site = document.body.dataset.site;
@@ -157,7 +95,7 @@ window.onload = () => {
             onloadRelics();
             break;
         case 'weekly':
-            onloadWeeklies();
+            initIndexedDBWeeklies();
             break;
     }
 
@@ -175,6 +113,189 @@ window.onload = () => {
     })
 };
 
+function setupVersionData() {
+    let objectStore = db.transaction(DB_VERSION_STORE, "readwrite").objectStore(DB_VERSION_STORE);
+    for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
+        let getRow = objectStore.get(key);
+        getRow.onsuccess = function () {
+            //restore / setup default values, if nothing found.
+            if (!getRow.result) {
+                objectStore.put({id: key, versions: value});
+            }
+            //fill edit input fields and main variable from saved.
+            readDB(DB_VERSION_STORE, key, function (stuff) {
+                document.querySelector('#' + key + 'Versions').value = stuff;
+                messageVariations[key] = convertTextToArray(stuff);
+            });
+        };
+    }
+}
+function setupRelicData() {
+    let objectStore = db.transaction(DB_RELIC_STORE, "readwrite").objectStore(DB_RELIC_STORE);
+    for (let i of [1, 2, 3, 4]) {
+        for (const idString of ['rt', 'rn', 'rg']) {
+            const key = '#' + idString + i;
+            let getRow = objectStore.get(key);
+            getRow.onsuccess = function () {
+                readDB(DB_RELIC_STORE, key, function (stuff) {
+                    if (stuff !== 'type' && stuff !== 'grade' && stuff !== '') {
+                        document.querySelector(key).dispatchEvent(new Event('change'));
+                        document.querySelector(key).value = stuff;
+                    }
+                });
+            };
+        }
+    }
+}
+async function getWeeklyData() {
+    //writeObjectToDB(DB_WEEKLY_TASKS, 'data', DEFAULT_WEEKLIES)
+    try {
+        //await writeIndexedDB(DB_WEEKLY_TASKS, 'data', DEFAULT_WEEKLIES);
+        let result = await readIndexedDB(DB_WEEKLY_TASKS, 'data');
+        if (result) {
+            return result
+        }
+        return DEFAULT_WEEKLIES;
+    } catch (error) {
+        console.error(error);
+    }
+    return {};
+}
+function writeDB(store, key, value, callback = null) {
+    let request = db.transaction([store], 'readwrite')
+        .objectStore(store)
+        .put({id: key, data: value});
+
+    request.onerror = function () {
+        console.error('Write failed');
+    }
+    request.onsuccess = function () {
+        if (typeof callback === 'function') {
+            callback();
+        }
+    };
+}
+function readDB(store, key, callback = null) {
+    let request = db.transaction([store])
+        .objectStore(store)
+        .get(key);
+    request.onerror = function () {
+        console.error('Read failed');
+    };
+    request.onsuccess = function () {
+        if (request.result) {
+            if (typeof callback === 'function') {
+                callback(request.result.data);
+            } else {
+                return request.result.data;
+            }
+        } else {
+            console.error('No data record');
+        }
+    };
+}
+function writeIndexedDB(storeName, id, value) {
+    return new Promise(function(resolve, reject) {
+        const objectRequest   = db.transaction(storeName, "readwrite").objectStore(storeName).put({id: id, data: value});
+
+        objectRequest.onerror = function(event) {
+            reject(Error('undefined error'));
+        };
+        objectRequest.onsuccess = function(event) {
+            resolve(true);
+        };
+    });
+}
+function readIndexedDB(storeName, id) {
+    return new Promise(function(resolve, reject) {
+        const objectRequest   = db.transaction(storeName).objectStore(storeName).get(id);
+
+        objectRequest.onerror = function(event) {
+            reject(Error('undefined error'));
+        };
+        objectRequest.onsuccess = function(event) {
+            if (objectRequest.result) {
+                resolve(objectRequest.result[id]);
+            } else {
+                resolve(null);
+            }
+        };
+    });
+}
+function clearIndexedDB(storeName) {
+    return new Promise(function(resolve, reject) {
+        const objectRequest   = db.transaction(storeName, "readwrite").objectStore(storeName).clear();
+
+        objectRequest.onerror = function(event) {
+            reject(Error('undefined error'));
+        };
+        objectRequest.onsuccess = function(event) {
+            resolve(true);
+        };
+    });
+}
+function clearDB(store) {
+    let storeObject = db.transaction([store], 'readwrite')
+        .objectStore(store);
+    let req = storeObject.clear();
+    req.onerror = function (evt) {
+        console.error('delete failed: ', evt.target.error);
+    };
+}
+function saveVersions() {
+    for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
+        let text = document.querySelector('#' + key + 'Versions').value;
+        let customArray = convertTextToArray(text);
+        if (!validateCustomArray(customArray)) {
+            return;
+        }
+        messageVariations[key] = customArray;
+        writeDB(DB_VERSION_STORE, key, text);
+    }
+    noti('Variations saved', 1000);
+}
+function saveRelics() {
+    for (let i of [1, 2, 3, 4]) {
+        for (const idString of ['rt', 'rn', 'rg']) {
+            let val = document.querySelector('#' + idString + i).value;
+            writeDB(DB_RELIC_STORE, '#' + idString + i, val);
+        }
+    }
+    noti('Relics saved', 1000);
+}
+function validateCustomArray(customArray) {
+    let lowerText = customArray.map(s => s.toLowerCase());
+    let noSpecials = lowerText.map(s => s.replace(/[^a-zA-Z0-9]*/g, ''));
+    let noRepeat = noSpecials.map(s => s.replace(/(.)\1+/g, '$1'));
+    let duplicates = noRepeat.filter((item, index) => index !== noRepeat.indexOf(item));
+    if (duplicates.length > 0) {
+        noti('Duplicate entries found: [' + duplicates.join('], [') + '] in "' + customArray.join(' ; ') + '". (The game\'s repeat detection ignores upper/lowercase characters, ' +
+            'special characters and repeated characters!) Save failed.', 30000, ERROR_COLOR);
+        return false;
+    }
+    return true;
+}
+function resetVersions() {
+    for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
+        document.querySelector('#' + key + 'Versions').value = value;
+        messageVariations[key] = convertTextToArray(value);
+        writeDB(DB_VERSION_STORE, key, value);
+    }
+    noti('Variations saved', 1000);
+}
+function forgetRelics() {
+    for (let i of [1, 2, 3, 4]) {
+        for (const idString of ['rt', 'rn', 'rg']) {
+            clearDB(DB_RELIC_STORE);
+        }
+    }
+    noti('Saved relics removed. Inputs reset to empty after a page reload.', 5000);
+}
+function convertTextToArray(text) {
+    let temp = text.split(';');
+    temp = temp.map(s => s.trim());
+    return temp;
+}
 function onloadRelics() {
     initIndexedDBRelics();
     document.querySelectorAll('.grid-container select').forEach(item => {
@@ -200,10 +321,6 @@ function onloadRelics() {
         return false;
     });
 }
-function onloadWeeklies() {
-    initIndexedDBWeeklies();
-}
-
 function initIndexedDBRelics() {
     const request = INDEXED_DB.open('relic_names', DB_VERSION);
 
@@ -221,16 +338,8 @@ function initIndexedDBRelics() {
     };
     request.onsuccess = function () {
         db = request.result;
-        let objectStore = db.transaction(DB_VERSION_STORE, "readwrite").objectStore(DB_VERSION_STORE);
-        for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
-            setupVersionData(objectStore, key);
-        }
-        let objectStore2 = db.transaction(DB_RELIC_STORE, "readwrite").objectStore(DB_RELIC_STORE);
-        for (let i of [1, 2, 3, 4]) {
-            for (const idString of ['rt', 'rn', 'rg']) {
-                setupRelicData(objectStore2, '#' + idString + i);
-            }
-        }
+        setupVersionData();
+        setupRelicData();
     }
 }
 function initIndexedDBWeeklies() {
@@ -241,28 +350,22 @@ function initIndexedDBWeeklies() {
     };
     request.onupgradeneeded = function () {
         db = request.result;
-        if (!db.objectStoreNames.contains(DB_VERSION_STORE)) {
-            db.createObjectStore(DB_VERSION_STORE, {keyPath: 'id'});
-        }
-        if (!db.objectStoreNames.contains(DB_RELIC_STORE)) {
-            db.createObjectStore(DB_RELIC_STORE, {keyPath: 'id'});
+        if (!db.objectStoreNames.contains(DB_WEEKLY_TASKS)) {
+            db.createObjectStore(DB_WEEKLY_TASKS, {keyPath: 'id'});
         }
     };
-    request.onsuccess = function () {
+    request.onsuccess = async function () {
         db = request.result;
-        let objectStore = db.transaction(DB_VERSION_STORE, "readwrite").objectStore(DB_VERSION_STORE);
-        for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
-            setupVersionData(objectStore, key);
+        weekly_data = await getWeeklyData();
+        const apiData = await fetchApiData();
+        if (!apiData.archonHunt) {
+            throw new Error('Error fetching api time data.');
         }
-        let objectStore2 = db.transaction(DB_RELIC_STORE, "readwrite").objectStore(DB_RELIC_STORE);
-        for (let i of [1, 2, 3, 4]) {
-            for (const idString of ['rt', 'rn', 'rg']) {
-                setupRelicData(objectStore2, '#' + idString + i);
-            }
-        }
+        updateDataUsingApiData(apiData);
+        console.log(apiData);
+        updateWeeklyHtml(weekly_data);
     }
 }
-
 function copyTextToClipboard(text) {
     const textArea = document.createElement("textarea");
     textArea.style.position = 'fixed';
@@ -286,7 +389,6 @@ function copyTextToClipboard(text) {
     }
     document.body.removeChild(textArea);
 }
-
 function unblockVariation(text) {
     for (let [index, blockedText] of blockedTexts.entries()) {
         if (blockedText === text) {
@@ -315,7 +417,6 @@ function getValidVariation(dummyText, skeleton) {
     }
     return '';
 }
-
 function iterateString(string, skeleton) {
     //if the insert by the current 'skeleton' is valid, return with that.
     let dataToInsert = {};
@@ -359,9 +460,6 @@ function doTheReplace(string, data) {
     }
     return string;
 }
-
-var fadeStartTimer;
-var fadeTimer;
 function noti(text, timeout = 15000, color = '#fff') {
     let noti = document.querySelector('#noti-text');
     clearInterval(fadeTimer);
@@ -374,7 +472,6 @@ function noti(text, timeout = 15000, color = '#fff') {
         fadeElement(document.querySelector('#noti-text'));
     }, timeout);
 }
-
 function fadeElement(element) {
     let op = 1;  // initial opacity
     fadeTimer = setInterval(function () {
@@ -387,7 +484,6 @@ function fadeElement(element) {
         op -= 0.05;
     }, 100);
 }
-
 function startCopy () {
     let relics = [];
     for (let i = 1; i <= 4; i++) {
@@ -424,7 +520,6 @@ function startCopy () {
     noti('Copied: ' + copyText);
     copyTextToClipboard(copyText);
 }
-
 function recolorRow(event) {
     const row = this.closest('.relic-block');
     row.classList.toggle('active');
@@ -434,17 +529,14 @@ function recolorRow(event) {
         event.cancelBubble = true;
     }
 }
-
 function relicNameToUpper() {
     this.value = this.value.toUpperCase();
 }
-
 function clickCheck() {
     const input = this.querySelector('input');
     input.checked = !input.checked;
     input.dispatchEvent(new Event('click'));
 }
-
 function generateSpamText(teamSize, relics) {
     let skeleton = {};
     /* the skeleton is a data structure like this:
@@ -477,7 +569,6 @@ function generateSpamText(teamSize, relics) {
     //generate valid version or die trying!!!
     return getValidVariation(copyText, skeleton);
 }
-
 function openSubmenu(buttonElement) {
     let divId = buttonElement.getAttribute('aria-controls');
     document.querySelectorAll('.todo-list-container').forEach(item => {
@@ -491,4 +582,119 @@ function openSubmenu(buttonElement) {
         item.classList.remove('active');
     });
     buttonElement.classList.add('active');
+}
+function updateWeeklyHtml(data) {
+    let activeHtml = '';
+    let completedHtml = '';
+    let disabledHtml = '';
+    let activeAmnt = 0;
+    let completedAmnt = 0;
+    let disabledAmnt = 0;
+    for (let [key, dataObj] of Object.entries(data)) {
+        if (key === 'lastWeekTimestamp') {
+            continue;
+        }
+        let infoHtml = '';
+        if (dataObj.info) {
+            infoHtml = `
+                <div class="info">
+                    <i class="bi-info-circle" data-bs-toggle="tooltip" title="${dataObj.info}"></i>
+                </div>`;
+        }
+        if (dataObj.isDisabled) {
+            disabledHtml += `
+                <div class="todo-list-item" id="${key}">
+                    <i class="bi-arrow-left-circle" onClick="restoreWeekly(this, '${key}')" data-bs-toggle="tooltip" title="Enable item"></i>
+                    <div class="title">${dataObj.displayName}</div>
+                    ${infoHtml}
+                </div>`;
+            disabledAmnt += 1;
+            continue;
+        }
+        if (dataObj.isCompleted) {
+            completedHtml += `
+                <div class="todo-list-item" id="${key}">
+                    <i class="bi-x-circle" onClick="uncompleteWeekly(this, '${key}')" data-bs-toggle="tooltip" title="Mark as incomplete"></i>
+                    <div class="title">${dataObj.displayName}</div>
+                    ${infoHtml}
+                    <i class="bi-dash-circle-dotted" onClick="disableWeekly(this, '${key}')" data-bs-toggle="tooltip" title="Disable item"></i>
+                </div>`;
+            completedAmnt += 1;
+            continue;
+        }
+        activeHtml += `
+            <div class="todo-list-item" id="${key}">
+                <i class="bi-check-circle" onClick="completeWeekly(this, '${key}')" data-bs-toggle="tooltip" title="Mark as complete"></i>
+                <div class="title">${dataObj.displayName}</div>
+                ${infoHtml}
+                <i class="bi-dash-circle-dotted" onClick="disableWeekly(this, '${key}')" data-bs-toggle="tooltip" title="Disable item"></i>
+            </div>`;
+        activeAmnt += 1;
+    }
+    document.getElementById('active-container').innerHTML = activeHtml;
+    document.getElementById('completed-container').innerHTML = completedHtml;
+    document.getElementById('disabled-container').innerHTML = disabledHtml;
+    document.querySelector('[aria-controls="active-container"]').innerHTML = `Active (${activeAmnt})`;
+    document.querySelector('[aria-controls="completed-container"]').innerHTML = `Completed (${completedAmnt})`;
+    document.querySelector('[aria-controls="disabled-container"]').innerHTML = `Disabled (${disabledAmnt})`;
+    resetTooltips();
+}
+function restoreWeekly(element, id) {
+    bootstrap.Tooltip.getInstance(element)?.hide();
+    weekly_data[id].isDisabled = false;
+    writeIndexedDB(DB_WEEKLY_TASKS, 'data', weekly_data).then(f => updateWeeklyHtml(weekly_data));
+}
+function disableWeekly(element, id) {
+    bootstrap.Tooltip.getInstance(element)?.hide();
+    weekly_data[id].isDisabled = true;
+    writeIndexedDB(DB_WEEKLY_TASKS, 'data', weekly_data).then(f => updateWeeklyHtml(weekly_data));
+}
+function completeWeekly(element, id) {
+    bootstrap.Tooltip.getInstance(element)?.hide();
+    weekly_data[id].isCompleted = true;
+    writeIndexedDB(DB_WEEKLY_TASKS, 'data', weekly_data).then(f => updateWeeklyHtml(weekly_data));
+}
+function uncompleteWeekly(element, id) {
+    bootstrap.Tooltip.getInstance(element)?.hide();
+    weekly_data[id].isCompleted = false;
+    writeIndexedDB(DB_WEEKLY_TASKS, 'data', weekly_data).then(f => updateWeeklyHtml(weekly_data));
+}
+function resetTooltips() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    })
+}
+async function fetchApiData() {
+    try {
+        const response = await fetch('https://api.warframestat.us/pc');
+        return await response.json();
+    } catch (error) {
+        throw new Error('Error fetching api data.');
+    }
+}
+function updateDataUsingApiData(serverData) {
+    const currentTime = new Date(serverData.timestamp);
+    const baroStartTime = new Date(serverData.voidTrader.activation);
+    const baroEndTime = new Date(serverData.voidTrader.expiry);
+    const weekStartDateStr = serverData.archonHunt.activation;
+
+    if (weekly_data.lastWeekTimestamp !== weekStartDateStr) {
+        weekly_data.lastWeekTimestamp = weekStartDateStr;
+        for (let [id, data] of Object.entries(weekly_data)) {
+            weekly_data[id].isCompleted = false;
+        }
+        weekly_data.baro_kiteer.isDisabled = !isOnThisWeek(baroStartTime, weekStartDateStr);
+    }
+
+    const isBaroActive = currentTime >= baroStartTime && currentTime <= baroEndTime;
+    weekly_data.baro_kiteer.info = isBaroActive ? `He is here! On ${serverData.voidTrader.location}` : `Arrives in: ${serverData.voidTrader.startString}`;
+    writeIndexedDB(DB_WEEKLY_TASKS, 'data', weekly_data).then(f => updateWeeklyHtml(weekly_data));
+}
+function isOnThisWeek (date, weekStartDateStr) {
+    const startOfWeek = new Date(weekStartDateStr);
+    const endOfWeek = new Date(weekStartDateStr);
+    endOfWeek.setDate(endOfWeek.getDate() + 7);
+
+    return date >= startOfWeek && date < endOfWeek;
 }

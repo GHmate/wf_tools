@@ -260,6 +260,7 @@ a:hover {
 .form-check-input {
     margin-top: 0;
     vertical-align: middle;
+    cursor: pointer;
 }
 
 .active-text {
@@ -268,6 +269,7 @@ a:hover {
     margin-left: 10px;
     color: #fff;
     user-select: none;
+    cursor: pointer;
 }
 
 .spam-button {

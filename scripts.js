@@ -24,63 +24,77 @@ const LOOP_ORDER = ['grade3', 'grade2', 'grade1', 'grade0', 'start', 'end'];
 const DEFAULT_WEEKLIES = {
     lastWeekTimestamp: '',
     acrithis_shop: {
-        displayName: 'Acrithis offerings',
+        displayName: `Acrithis offerings`,
         isCompleted: false,
         isDisabled: false,
         info: '',
         lastChanged: ''
     },
     archon_hunt: {
-        displayName: 'Archon hunt',
+        displayName: `Archon hunt`,
         isCompleted: false,
         isDisabled: false,
         info: '',
         lastChanged: ''
     },
     baro_kiteer: {
-        displayName: 'Baro Ki\'Teer',
+        displayName: `Baro Ki'Teer`,
         isCompleted: false,
         isDisabled: false,
         info: '',
         lastChanged: ''
     },
-    circuit: {
-        displayName: 'The Circuit',
+    help_clem: {
+        displayName: `Help Clem`,
         isCompleted: false,
         isDisabled: false,
         info: '',
         lastChanged: ''
     },
     kahl_missions: {
-        displayName: 'Kahl\'s mission',
+        displayName: `Kahl's mission`,
+        isCompleted: false,
+        isDisabled: false,
+        info: '',
+        lastChanged: ''
+    },
+    maroo_ayatan: {
+        displayName: `Maroo's ayatan hunt`,
         isCompleted: false,
         isDisabled: false,
         info: '',
         lastChanged: ''
     },
     netracells: {
-        displayName: 'Netracells',
+        displayName: `Netracells`,
         isCompleted: false,
         isDisabled: false,
         info: '',
         lastChanged: ''
     },
     nightwave_shop: {
-        displayName: 'Nightwave cred offerings',
+        displayName: `Nightwave cred offerings`,
         isCompleted: false,
         isDisabled: false,
         info: '',
         lastChanged: ''
     },
     palladino_shop: {
-        displayName: 'Palladino shop',
+        displayName: `Palladino shop`,
         isCompleted: false,
         isDisabled: false,
         info: '',
         lastChanged: ''
     },
     steel_path_shop: {
-        displayName: 'Steel path shop',
+        displayName: `Steel path shop`,
+        isCompleted: false,
+        isDisabled: false,
+        info: '',
+        lastChanged: ''
+    },
+    circuit: {
+        displayName: `The Circuit`,
         isCompleted: false,
         isDisabled: false,
         info: '',

@@ -4,6 +4,10 @@ const DB_VERSION_STORE = 'versionData';
 const DB_RELIC_STORE = 'relicData';
 const DB_WEEKLY_TASKS = 'weeklyTasks';
 
+const scriptElement = document.querySelector('script[src^="./scripts.js"]');
+const versionParam = scriptElement.src.match(/[?&]v=([^&]+)/);
+const versionNumber = versionParam ? versionParam[1] : null;
+
 let db; //indexedDB
 let messageVariations = {};
 let fadeStartTimer;
@@ -22,7 +26,10 @@ const DEFAULT_VERSION_TEXTS = {
 }
 const LOOP_ORDER = ['grade3', 'grade2', 'grade1', 'grade0', 'start', 'end'];
 const DEFAULT_WEEKLIES = {
-    lastWeekTimestamp: '',
+    metaData: {
+        lastWeekTimestamp: '',
+        versionNumber: versionNumber
+    },
     acrithis_shop: {
         displayName: `Acrithis offerings`,
         isCompleted: false,
@@ -150,11 +157,26 @@ function setupRelicData() {
     }
 }
 async function getWeeklyData() {
-    //writeObjectToDB(DB_WEEKLY_TASKS, 'data', DEFAULT_WEEKLIES)
     try {
-        //await writeIndexedDB(DB_WEEKLY_TASKS, 'data', DEFAULT_WEEKLIES);
         let result = await readIndexedDB(DB_WEEKLY_TASKS, 'data');
         if (result) {
+            if (!result.metaData || !result.metaData.versionNumber) {
+                alert(`There was a version update (${versionNumber}), your saved data is reset.`);
+                return DEFAULT_WEEKLIES;
+            }
+            if (result.metaData.versionNumber !== versionNumber) {
+                alert(`There was a version update (${versionNumber}), it is possible that some of your saved data is lost.`);
+                let newResult = DEFAULT_WEEKLIES;
+                for (let [key, val] of Object.entries(result)) {
+                    if (key !== 'metaData' && newResult[key]) {
+                        newResult[key]['isCompleted'] = val['isCompleted'];
+                        newResult[key]['isDisabled'] = val['isDisabled'];
+                    }
+                }
+                newResult.metaData.lastWeekTimestamp = result.metaData.lastWeekTimestamp;
+                await writeIndexedDB(DB_WEEKLY_TASKS, 'data', newResult);
+                return newResult;
+            }
             return result
         }
         return DEFAULT_WEEKLIES;
@@ -364,7 +386,6 @@ function initIndexedDBWeeklies() {
             throw new Error('Error fetching api time data.');
         }
         updateDataUsingApiData(apiData);
-        console.log(apiData);
         updateWeeklyHtml(weekly_data);
         initPointsOfInterests(apiData);
     }
@@ -594,7 +615,7 @@ function updateWeeklyHtml(data) {
     let completedAmnt = 0;
     let disabledAmnt = 0;
     for (let [key, dataObj] of Object.entries(data)) {
-        if (key === 'lastWeekTimestamp') {
+        if (key === 'metaData') {
             continue;
         }
         let infoHtml = '';
@@ -682,8 +703,8 @@ function updateDataUsingApiData(serverData) {
     const baroEndTime = new Date(serverData.voidTrader.expiry);
     const weekStartDateStr = serverData.archonHunt.activation;
 
-    if (weekly_data.lastWeekTimestamp !== weekStartDateStr) {
-        weekly_data.lastWeekTimestamp = weekStartDateStr;
+    if (weekly_data.metaData.lastWeekTimestamp !== weekStartDateStr) {
+        weekly_data.metaData.lastWeekTimestamp = weekStartDateStr;
         for (let [id, data] of Object.entries(weekly_data)) {
             weekly_data[id].isCompleted = false;
         }

@@ -730,11 +730,23 @@ function removeWeeklySavedData() {
 }
 function initPointsOfInterests(apiData) {
     let poiHtml = '';
-
     if (apiData.alerts) {
+        const checks = ['Gift','Gifts'];
         for ([key, data] of Object.entries(apiData.alerts)) {
-            if (data.mission.description === 'Gift From The Lotus' && data.active) {
-                poiHtml += `<span>Gift From The Lotus:</span><span>${data.mission.reward.asString}</span><span>${data.mission.node}</span>`;
+            if (data.active && checks.some(word => data.mission.description.includes(word))) {
+                poiHtml += `<span>${data.mission.description}:</span><span>${data.mission.reward.asString}</span><span>${data.mission.node}</span>`;
+            }
+        }
+    }
+    if (apiData.events) {
+        const checks = ['Gift','Gifts'];
+        for ([key, data] of Object.entries(apiData.events)) {
+            if (data.active && checks.some(word => data.description.includes(word))) {
+                let rewards = [];
+                for (let reward of data.rewards) {
+                    rewards.push(reward.asString);
+                }
+                poiHtml += `<span>${data.description}:</span><span>${rewards.join(', ')}</span><span>${data.node}</span>`;
             }
         }
     }

@@ -51,6 +51,20 @@ const DEFAULT_WEEKLIES = {
         info: '',
         lastChanged: ''
     },
+    bird_shard: {
+        displayName: `Bird 3 archon shard`,
+        isCompleted: false,
+        isDisabled: false,
+        info: '',
+        lastChanged: ''
+    },
+    archimedea: {
+        displayName: `Deep/Elite Archimedea`,
+        isCompleted: false,
+        isDisabled: false,
+        info: '',
+        lastChanged: ''
+    },
     help_clem: {
         displayName: `Help Clem`,
         isCompleted: false,

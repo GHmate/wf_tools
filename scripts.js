@@ -744,30 +744,40 @@ function removeWeeklySavedData() {
 }
 function initPointsOfInterests(apiData) {
     let poiHtml = '';
-    if (apiData.alerts) {
-        const checks = ['Gift','Gifts'];
-        for ([key, data] of Object.entries(apiData.alerts)) {
-            if (data.active && checks.some(word => data.mission.description.includes(word))) {
-                poiHtml += `<span>${data.mission.description}:</span><span>${data.mission.reward.asString}</span><span>${data.mission.node}</span>`;
-            }
-        }
-    }
-    if (apiData.events) {
+	if (apiData.events) {
         const checks = ['Gift','Gifts'];
         for ([key, data] of Object.entries(apiData.events)) {
-            if (data.active && checks.some(word => data.description.includes(word))) {
+            if (data.description && data.active && checks.some(word => data.description.includes(word))) {
                 let rewards = [];
                 for (let reward of data.rewards) {
                     rewards.push(reward.asString);
                 }
                 poiHtml += `<span>${data.description}:</span><span>${rewards.join(', ')}</span><span>${data.node}</span>`;
+				continue;
+            }
+			let rewardText = getUsefulRewards(data);
+            if (rewardText) {
+                poiHtml += `<span>Invasion:</span><span>${rewardText}</span><span>${data.description}</span>`;
+            }
+        }
+    }
+    if (apiData.alerts) {
+        const checks = ['Gift','Gifts'];
+        for ([key, data] of Object.entries(apiData.alerts)) {
+            if (data.mission?.description && data.active && checks.some(word => data.mission.description.includes(word))) {
+                poiHtml += `<span>${data.mission.description}:</span><span>${data.mission.reward.asString}</span><span>${data.mission.node}</span>`;
+				continue;
+            }
+			let rewardText = getUsefulRewards(data);
+            if (rewardText) {
+                poiHtml += `<span>Alert:</span><span>${rewardText}</span><span>${data.tag ? data.tag : 'unnamed'}</span>`;
             }
         }
     }
     if (apiData.invasions) {
         for ([key, data] of Object.entries(apiData.invasions)) {
-            let rewardText = getInvasionUsefulRewards(data);
-            if (data.completed === false && rewardText) {
+            let rewardText = getUsefulRewards(data);
+            if (rewardText) {
                 poiHtml += `<span>Invasion:</span><span>${rewardText}</span><span>${data.desc}</span>`;
             }
         }
@@ -778,19 +788,37 @@ function initPointsOfInterests(apiData) {
         document.querySelector('#poiCollapseWrapper > div').innerHTML = poiHtml;
     }
 }
-function getInvasionUsefulRewards(data) {
+function getUsefulRewards(data) {
+    if (data.completed) {
+        return '';
+    }
+
     let result = '';
     const usefulRewards = ['forma', 'catalyst', 'reactor', 'adapter'];
     if (data.defenderReward?.asString) {
-        let defender = data.defenderReward.asString.toLowerCase();
-        if (usefulRewards.some(substring => defender.includes(substring))) {
-            result += `${defender}`;
+        let rewardStr = data.defenderReward.asString.toLowerCase();
+        if (usefulRewards.some(substring => rewardStr.includes(substring))) {
+            result += `${rewardStr}`;
         }
     }
     if (data.attackerReward?.asString) {
-        let attacker = data.attackerReward.asString.toLowerCase();
-        if (usefulRewards.some(substring => attacker.includes(substring))) {
-            result += `${attacker}`;
+        let rewardStr = data.attackerReward.asString.toLowerCase();
+        if (usefulRewards.some(substring => rewardStr.includes(substring))) {
+            result += `${rewardStr}`;
+        }
+    }
+    if (data.mission?.reward?.asString) {
+        let rewardStr = data.mission.reward.asString.toLowerCase();
+        if (usefulRewards.some(substring => rewardStr.includes(substring))) {
+            result += `${rewardStr}`;
+        }
+    }
+    if (data.rewards) {
+        for (let reward of data.rewards) {
+			let rewardStr = reward.asString.toLowerCase();
+			if (usefulRewards.some(substring => rewardStr.includes(substring))) {
+				result += `${rewardStr}`;
+			}
         }
     }
 

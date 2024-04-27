@@ -136,37 +136,29 @@ window.onload = () => {
     }
 };
 
-function setupVersionData() {
-    let objectStore = db.transaction(DB_VERSION_STORE, "readwrite").objectStore(DB_VERSION_STORE);
+async function setupVersionData() {
     for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
-        let getRow = objectStore.get(key);
-        getRow.onsuccess = function () {
-            //restore / setup default values, if nothing found.
-            if (!getRow.result) {
-                objectStore.put({id: key, versions: value});
-            }
-            //fill edit input fields and main variable from saved.
-            readDB(DB_VERSION_STORE, key, function (stuff) {
-                document.querySelector('#' + key + 'Versions').value = stuff;
-                messageVariations[key] = convertTextToArray(stuff);
-            });
-        };
+        let savedRowData = await readIndexedDB(DB_VERSION_STORE, key);
+        if (!savedRowData) {
+            await writeIndexedDB(DB_VERSION_STORE, key, value);
+            savedRowData = value;
+        }
+        document.querySelector('#' + key + 'Versions').value = savedRowData;
+        messageVariations[key] = convertTextToArray(savedRowData);
     }
 }
-function setupRelicData() {
-    let objectStore = db.transaction(DB_RELIC_STORE, "readwrite").objectStore(DB_RELIC_STORE);
+async function setupRelicData() {
     for (let i of [1, 2, 3, 4]) {
         for (const idString of ['rt', 'rn', 'rg']) {
             const key = '#' + idString + i;
-            let getRow = objectStore.get(key);
-            getRow.onsuccess = function () {
-                readDB(DB_RELIC_STORE, key, function (stuff) {
-                    if (stuff !== 'type' && stuff !== 'grade' && stuff !== '') {
-                        document.querySelector(key).dispatchEvent(new Event('change'));
-                        document.querySelector(key).value = stuff;
-                    }
-                });
-            };
+            let data = await readIndexedDB(DB_RELIC_STORE, key);
+            if (!data) {
+                continue;
+            }
+            if (data !== 'type' && data !== 'grade' && data !== '') {
+                document.querySelector(key).dispatchEvent(new Event('change'));
+                document.querySelector(key).value = data;
+            }
         }
     }
 }
@@ -199,39 +191,6 @@ async function getWeeklyData() {
     }
     return {};
 }
-function writeDB(store, key, value, callback = null) {
-    let request = db.transaction([store], 'readwrite')
-        .objectStore(store)
-        .put({id: key, data: value});
-
-    request.onerror = function () {
-        console.error('Write failed');
-    }
-    request.onsuccess = function () {
-        if (typeof callback === 'function') {
-            callback();
-        }
-    };
-}
-function readDB(store, key, callback = null) {
-    let request = db.transaction([store])
-        .objectStore(store)
-        .get(key);
-    request.onerror = function () {
-        console.error('Read failed');
-    };
-    request.onsuccess = function () {
-        if (request.result) {
-            if (typeof callback === 'function') {
-                callback(request.result.data);
-            } else {
-                return request.result.data;
-            }
-        } else {
-            console.error('No data record');
-        }
-    };
-}
 function writeIndexedDB(storeName, id, value) {
     return new Promise(function(resolve, reject) {
         const objectRequest   = db.transaction(storeName, "readwrite").objectStore(storeName).put({id: id, data: value});
@@ -246,14 +205,13 @@ function writeIndexedDB(storeName, id, value) {
 }
 function readIndexedDB(storeName, id) {
     return new Promise(function(resolve, reject) {
-        const objectRequest   = db.transaction(storeName).objectStore(storeName).get(id);
-
+        const objectRequest = db.transaction(storeName).objectStore(storeName).get(id);
         objectRequest.onerror = function(event) {
             reject(Error('undefined error'));
         };
         objectRequest.onsuccess = function(event) {
             if (objectRequest.result) {
-                resolve(objectRequest.result[id]);
+                resolve(objectRequest.result.data);
             } else {
                 resolve(null);
             }
@@ -288,15 +246,15 @@ function saveVersions() {
             return;
         }
         messageVariations[key] = customArray;
-        writeDB(DB_VERSION_STORE, key, text);
+        writeIndexedDB(DB_VERSION_STORE, key, text);
     }
     noti('Variations saved', 1000);
 }
-function saveRelics() {
+async function saveRelics() {
     for (let i of [1, 2, 3, 4]) {
         for (const idString of ['rt', 'rn', 'rg']) {
             let val = document.querySelector('#' + idString + i).value;
-            writeDB(DB_RELIC_STORE, '#' + idString + i, val);
+            await writeIndexedDB(DB_RELIC_STORE, '#' + idString + i, val);
         }
     }
     noti('Relics saved', 1000);
@@ -317,7 +275,7 @@ function resetVersions() {
     for(const [key, value] of Object.entries(DEFAULT_VERSION_TEXTS)) {
         document.querySelector('#' + key + 'Versions').value = value;
         messageVariations[key] = convertTextToArray(value);
-        writeDB(DB_VERSION_STORE, key, value);
+        writeIndexedDB(DB_VERSION_STORE, key, value);
     }
     noti('Variations saved', 1000);
 }

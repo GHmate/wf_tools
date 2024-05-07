@@ -316,16 +316,31 @@ function onloadRelics() {
         item.parentElement.addEventListener('click', clickCheck);
         return false;
     });
-    const button1 = document.querySelector('#button1');
-    button1.onclick = () => {
-        if (button1.classList.contains('animated')) {
-            return;
+    for (let button of document.querySelectorAll('input[type="button"].custom')) {
+        button.onclick = () => {
+            if (button.classList.contains('animated')) {
+                return;
+            }
+            button.classList.add('animated');
+            setTimeout(() => {
+                button.classList.remove('animated');
+            }, 500);
+
+            const closestRelicBlock = button.closest('div.relic-block');
+            if (closestRelicBlock) {
+                const selects = closestRelicBlock.querySelectorAll('select');
+                selects.forEach(select => {
+                    const optionToSelect = select.querySelector('option[hidden]');
+                    optionToSelect.selected = true;
+                    select.style = undefined;
+                });
+                const nameInput = closestRelicBlock.querySelector('.js-relic-name');
+                nameInput.value = '';
+                nameInput.style = undefined;
+            }
         }
-        button1.classList.add('animated');
-        setTimeout(() => {
-            button1.classList.remove('animated');
-        }, 500);
     }
+
 }
 function initIndexedDBRelics() {
     const request = INDEXED_DB.open('relic_names', DB_VERSION);
@@ -498,7 +513,7 @@ function startCopy () {
         let rg = document.querySelector('#rg' + i);
         let ra = document.querySelector('#ra' + i);
         if (ra.checked) {
-            if (rt.value !== 'Relic type' && rn.value !== '' && rg.value !== 'Relic grade') {
+            if (rt.value !== 'type' && rn.value !== '' && rg.value !== 'grade') {
                 let relic1 = {
                     'type': rt.value,
                     'name': rn.value,

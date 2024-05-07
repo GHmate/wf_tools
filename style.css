@@ -385,23 +385,26 @@ a:hover {
     justify-content: center;
     align-items: center;
 }
+label.center-flex {
+    padding: 9px 18px;
+    cursor: pointer;
+}
 input[type=button].custom {
     display: none;
     & + label {
         position: relative;
         user-select: none;
         cursor: pointer;
-        padding: 5px 10px;
+        padding: 4px 6px;
         & > svg {
             display: block;
             color: white;
-            transition: all 0.2s;
-            filter: drop-shadow(0px 0px 10px rgba(145, 96, 209, var(--opacity)));
+            filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, var(--opacity)));
         }
     }
     &.animated {
         & + label > svg {
-            animation: colorAnim 500ms ease-out;
+            animation: colorAnim 600ms ease-in;
         }
     }
 }
@@ -412,7 +415,7 @@ input[type=button].custom {
 }
 @keyframes colorAnim {
     from {
-        color: #365b91;
+        color: #6e93cf;
         --opacity: 1;
     }
     to {

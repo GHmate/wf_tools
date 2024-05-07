@@ -316,6 +316,16 @@ function onloadRelics() {
         item.parentElement.addEventListener('click', clickCheck);
         return false;
     });
+    const button1 = document.querySelector('#button1');
+    button1.onclick = () => {
+        if (button1.classList.contains('animated')) {
+            return;
+        }
+        button1.classList.add('animated');
+        setTimeout(() => {
+            button1.classList.remove('animated');
+        }, 500);
+    }
 }
 function initIndexedDBRelics() {
     const request = INDEXED_DB.open('relic_names', DB_VERSION);

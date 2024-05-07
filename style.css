@@ -246,6 +246,11 @@ a:hover {
     margin-left: 10px;
 }
 
+.radio-container {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
 .radio-container input {
     width: 20px;
     height: 20px;
@@ -254,7 +259,10 @@ a:hover {
 .radio-container label {
     font-size: 22px;
     line-height: 19PX;
-    margin-left: 2px;
+    display: flex;
+    gap: 10px;
+    padding: 7px 10px;
+    cursor: pointer;
 }
 
 .form-check-input {
@@ -371,4 +379,44 @@ a:hover {
     align-items: center;
     row-gap: 20px;
     column-gap: min(4%, 30px);
+}
+.center-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+input[type=button].custom {
+    display: none;
+    & + label {
+        position: relative;
+        user-select: none;
+        cursor: pointer;
+        padding: 5px 10px;
+        & > svg {
+            display: block;
+            color: white;
+            transition: all 0.2s;
+            filter: drop-shadow(0px 0px 10px rgba(145, 96, 209, var(--opacity)));
+        }
+    }
+    &.animated {
+        & + label > svg {
+            animation: colorAnim 500ms ease-out;
+        }
+    }
+}
+@property --opacity {
+    syntax: '<number>';
+    initial-value: 0;
+    inherits: false;
+}
+@keyframes colorAnim {
+    from {
+        color: #365b91;
+        --opacity: 1;
+    }
+    to {
+        color: white;
+        --opacity: 0;
+    }
 }

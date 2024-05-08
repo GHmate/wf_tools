@@ -408,6 +408,27 @@ input[type=button].custom {
         }
     }
 }
+input[type=checkbox].custom {
+    display: none;
+    & + label {
+        position: relative;
+        user-select: none;
+        cursor: pointer;
+        padding: 4px 12px;
+        & > svg {
+            display: block;
+            color: white;
+            transition: color 0.2s;
+            filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, var(--opacity)));
+        }
+    }
+    &:checked {
+        & + label > svg {
+            color: #caea3d;
+            --opacity: 1;
+        }
+    }
+}
 @property --opacity {
     syntax: '<number>';
     initial-value: 0;

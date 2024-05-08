@@ -31,7 +31,7 @@
         <div class='grid-container'>
             <div class='relic-block block1'>
                 <div class="select-container">
-                    <select class='form-control' id='rt1'>
+                    <select class='form-control js-relic-type'>
                         <option selected disabled hidden>type</option>
                         <option value='Lith'>Lith</option>
                         <option value='Meso'>Meso</option>
@@ -41,10 +41,10 @@
                     </select>
                 </div>
                 <div class="select-container">
-                    <input id='rn1' class='form-control js-relic-name' type='text' placeholder='relic name'>
+                    <input class='form-control js-relic-name' type='text' placeholder='relic name'>
                 </div>
                 <div class="select-container">
-                    <select class='form-control' id='rg1'>
+                    <select class='form-control js-relic-grade'>
                         <option selected disabled hidden>grade</option>
                         <option value='int'>Intact</option>
                         <option value='exc'>Exceptional</option>
@@ -53,12 +53,13 @@
                     </select>
                 </div>
                 <div class="center-flex">
-                    <label  class="center-flex" for="ra1">
-                        <input id='ra1' class='form-check-input' type='checkbox'/>
+                    <input id='ra1' class='custom js-activate-row' type='checkbox'/>
+                    <label  class="center-flex" for="ra1" data-bs-toggle="tooltip" title="mark relic as important">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 23 23"><path fill="currentColor" fill-opacity="0.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3L9.65 8.76L3.44 9.22L8.2 13.24L6.71 19.28L12 16M12 3L14.35 8.76L20.56 9.22L15.8 13.24L17.29 19.28L12 16"/></svg>
                     </label>
                     <div class="center-flex">
                         <input class="custom" type="button" id="tb1">
-                        <label for="tb1">
+                        <label for="tb1" data-bs-toggle="tooltip" title="remove relic">
                             <svg xmlns="http://www.w3.org/2000/svg" width="26px" height="26px" viewBox="0 0 512 512"><path fill="none" d="M296 64h-80a7.91 7.91 0 0 0-8 8v24h96V72a7.91 7.91 0 0 0-8-8"/><path fill="currentColor" d="M432 96h-96V72a40 40 0 0 0-40-40h-80a40 40 0 0 0-40 40v24H80a16 16 0 0 0 0 32h17l19 304.92c1.42 26.85 22 47.08 48 47.08h184c26.13 0 46.3-19.78 48-47l19-305h17a16 16 0 0 0 0-32M192.57 416H192a16 16 0 0 1-16-15.43l-8-224a16 16 0 1 1 32-1.14l8 224A16 16 0 0 1 192.57 416M272 400a16 16 0 0 1-32 0V176a16 16 0 0 1 32 0Zm32-304h-96V72a7.91 7.91 0 0 1 8-8h80a7.91 7.91 0 0 1 8 8Zm32 304.57A16 16 0 0 1 320 416h-.58A16 16 0 0 1 304 399.43l8-224a16 16 0 1 1 32 1.14Z"/></svg>
                         </label>
                     </div>
@@ -66,7 +67,7 @@
             </div>
             <div class='relic-block block2'>
                 <div class="select-container">
-                    <select class='form-control' id='rt2'>
+                    <select class='form-control js-relic-type'>
                         <option selected disabled hidden>type</option>
                         <option value='Lith'>Lith</option>
                         <option value='Meso'>Meso</option>
@@ -76,10 +77,10 @@
                     </select>
                 </div>
                 <div class="select-container">
-                    <input id='rn2' class='form-control js-relic-name' type='text' placeholder='relic name'>
+                    <input class='form-control js-relic-name' type='text' placeholder='relic name'>
                 </div>
                 <div class="select-container">
-                    <select class='form-control' id='rg2'>
+                    <select class='form-control js-relic-grade'>
                         <option selected disabled hidden>grade</option>
                         <option value='int'>Intact</option>
                         <option value='exc'>Exceptional</option>
@@ -88,12 +89,13 @@
                     </select>
                 </div>
                 <div class="center-flex">
-                    <label  class="center-flex" for="ra2">
-                        <input id='ra2' class='form-check-input' type='checkbox'/>
+                    <input id='ra2' class='custom js-activate-row' type='checkbox'/>
+                    <label  class="center-flex" for="ra2" data-bs-toggle="tooltip" title="mark relic as important">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 23 23"><path fill="currentColor" fill-opacity="0.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3L9.65 8.76L3.44 9.22L8.2 13.24L6.71 19.28L12 16M12 3L14.35 8.76L20.56 9.22L15.8 13.24L17.29 19.28L12 16"/></svg>
                     </label>
                     <div class="center-flex">
                         <input class="custom" type="button" id="tb2">
-                        <label for="tb2">
+                        <label for="tb2" data-bs-toggle="tooltip" title="remove relic">
                             <svg xmlns="http://www.w3.org/2000/svg" width="26px" height="26px" viewBox="0 0 512 512"><path fill="none" d="M296 64h-80a7.91 7.91 0 0 0-8 8v24h96V72a7.91 7.91 0 0 0-8-8"/><path fill="currentColor" d="M432 96h-96V72a40 40 0 0 0-40-40h-80a40 40 0 0 0-40 40v24H80a16 16 0 0 0 0 32h17l19 304.92c1.42 26.85 22 47.08 48 47.08h184c26.13 0 46.3-19.78 48-47l19-305h17a16 16 0 0 0 0-32M192.57 416H192a16 16 0 0 1-16-15.43l-8-224a16 16 0 1 1 32-1.14l8 224A16 16 0 0 1 192.57 416M272 400a16 16 0 0 1-32 0V176a16 16 0 0 1 32 0Zm32-304h-96V72a7.91 7.91 0 0 1 8-8h80a7.91 7.91 0 0 1 8 8Zm32 304.57A16 16 0 0 1 320 416h-.58A16 16 0 0 1 304 399.43l8-224a16 16 0 1 1 32 1.14Z"/></svg>
                         </label>
                     </div>
@@ -101,7 +103,7 @@
             </div>
             <div class='relic-block block3'>
                 <div class="select-container">
-                    <select class='form-control' id='rt3'>
+                    <select class='form-control js-relic-type'>
                         <option selected disabled hidden>type</option>
                         <option value='Lith'>Lith</option>
                         <option value='Meso'>Meso</option>
@@ -111,10 +113,10 @@
                     </select>
                 </div>
                 <div class="select-container">
-                    <input id='rn3' class='form-control js-relic-name' type='text' placeholder='relic name'>
+                    <input class='form-control js-relic-name' type='text' placeholder='relic name'>
                 </div>
                 <div class="select-container">
-                    <select class='form-control' id='rg3'>
+                    <select class='form-control js-relic-grade'>
                         <option selected disabled hidden>grade</option>
                         <option value='int'>Intact</option>
                         <option value='exc'>Exceptional</option>
@@ -123,12 +125,13 @@
                     </select>
                 </div>
                 <div class="center-flex">
-                    <label  class="center-flex" for="ra3">
-                        <input id='ra3' class='form-check-input' type='checkbox'/>
+                    <input id='ra3' class='custom js-activate-row' type='checkbox'/>
+                    <label  class="center-flex" for="ra3" data-bs-toggle="tooltip" title="mark relic as important">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 23 23"><path fill="currentColor" fill-opacity="0.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3L9.65 8.76L3.44 9.22L8.2 13.24L6.71 19.28L12 16M12 3L14.35 8.76L20.56 9.22L15.8 13.24L17.29 19.28L12 16"/></svg>
                     </label>
                     <div class="center-flex">
                         <input class="custom" type="button" id="tb3">
-                        <label for="tb3">
+                        <label for="tb3" data-bs-toggle="tooltip" title="remove relic">
                             <svg xmlns="http://www.w3.org/2000/svg" width="26px" height="26px" viewBox="0 0 512 512"><path fill="none" d="M296 64h-80a7.91 7.91 0 0 0-8 8v24h96V72a7.91 7.91 0 0 0-8-8"/><path fill="currentColor" d="M432 96h-96V72a40 40 0 0 0-40-40h-80a40 40 0 0 0-40 40v24H80a16 16 0 0 0 0 32h17l19 304.92c1.42 26.85 22 47.08 48 47.08h184c26.13 0 46.3-19.78 48-47l19-305h17a16 16 0 0 0 0-32M192.57 416H192a16 16 0 0 1-16-15.43l-8-224a16 16 0 1 1 32-1.14l8 224A16 16 0 0 1 192.57 416M272 400a16 16 0 0 1-32 0V176a16 16 0 0 1 32 0Zm32-304h-96V72a7.91 7.91 0 0 1 8-8h80a7.91 7.91 0 0 1 8 8Zm32 304.57A16 16 0 0 1 320 416h-.58A16 16 0 0 1 304 399.43l8-224a16 16 0 1 1 32 1.14Z"/></svg>
                         </label>
                     </div>
@@ -136,7 +139,7 @@
             </div>
             <div class='relic-block block4'>
                 <div class="select-container">
-                    <select class='form-control' id='rt4'>
+                    <select class='form-control js-relic-type'>
                         <option selected disabled hidden>type</option>
                         <option value='Lith'>Lith</option>
                         <option value='Meso'>Meso</option>
@@ -146,10 +149,10 @@
                     </select>
                 </div>
                 <div class="select-container">
-                    <input id='rn4' class='form-control js-relic-name' type='text' placeholder='relic name'/>
+                    <input class='form-control js-relic-name' type='text' placeholder='relic name'/>
                 </div>
                 <div class="select-container">
-                    <select class='form-control' id='rg4'>
+                    <select class='form-control js-relic-grade'>
                         <option selected disabled hidden>grade</option>
                         <option value='int'>Intact</option>
                         <option value='exc'>Exceptional</option>
@@ -158,12 +161,13 @@
                     </select>
                 </div>
                 <div class="center-flex">
-                    <label  class="center-flex" for="ra4">
-                        <input id='ra4' class='form-check-input' type='checkbox'/>
+                    <input id='ra4' class='custom js-activate-row' type='checkbox'/>
+                    <label  class="center-flex" for="ra4" data-bs-toggle="tooltip" title="mark relic as important">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 23 23"><path fill="currentColor" fill-opacity="0.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3L9.65 8.76L3.44 9.22L8.2 13.24L6.71 19.28L12 16M12 3L14.35 8.76L20.56 9.22L15.8 13.24L17.29 19.28L12 16"/></svg>
                     </label>
                     <div class="center-flex">
                         <input class="custom" type="button" id="tb4">
-                        <label for="tb4">
+                        <label for="tb4" data-bs-toggle="tooltip" title="remove relic">
                             <svg xmlns="http://www.w3.org/2000/svg" width="26px" height="26px" viewBox="0 0 512 512"><path fill="none" d="M296 64h-80a7.91 7.91 0 0 0-8 8v24h96V72a7.91 7.91 0 0 0-8-8"/><path fill="currentColor" d="M432 96h-96V72a40 40 0 0 0-40-40h-80a40 40 0 0 0-40 40v24H80a16 16 0 0 0 0 32h17l19 304.92c1.42 26.85 22 47.08 48 47.08h184c26.13 0 46.3-19.78 48-47l19-305h17a16 16 0 0 0 0-32M192.57 416H192a16 16 0 0 1-16-15.43l-8-224a16 16 0 1 1 32-1.14l8 224A16 16 0 0 1 192.57 416M272 400a16 16 0 0 1-32 0V176a16 16 0 0 1 32 0Zm32-304h-96V72a7.91 7.91 0 0 1 8-8h80a7.91 7.91 0 0 1 8 8Zm32 304.57A16 16 0 0 1 320 416h-.58A16 16 0 0 1 304 399.43l8-224a16 16 0 1 1 32 1.14Z"/></svg>
                         </label>
                     </div>
@@ -259,10 +263,17 @@
                 and get your updated message with a button click. You can customize the text variations in the options, and your browser will remember these when saved.</p>
             <h4>How to use?</h4>
             <p><b>Relic message generation:</b><br/>
-                Use the dropdown and text inputs to set your relics (maximum 4 in a single message), check the active box, and select your current squad size. Press the "Generate text" button to generate a new message.
-                Use the "Active" checkboxes to easily remove or add back specific relics to your message on the fly. The relics' grade text and the start/end of the message will automatically change to avoid
-                duplicate detection, you can customize these values in the settings. The algorithm will re-use previous messages when their duplicate prevention timer expires. You can save your input in
-                your browser's storage if you want them to stay there next time you open this page. You don't have to save them every time to generate text, it's only an optional feature.<br/>
+                Use the dropdown and text inputs to set your relics (maximum 4 in a single message), and select your current squad size. Press the "Generate text" button to generate a new message.
+                Use the 'star' (important) checkboxes to filter which relics are selected for text generation. If none of the relics are marked as important, all valid relics will end up in the message,
+                but if one or more are marked, only those will be included. Remove unwanted relics with the trash icon. The relics' grade text and the start/end of the message will automatically change to avoid
+                the game's duplicate input detection, you can customize these values in the settings. The algorithm will re-use previous messages when their duplicate prevention timer expires. You can save your input in
+                your browser's storage if you want them to stay there next time you open this page. You don't have to save them to generate messages, it's an optional convenience feature.<br/><br/>
+            <b>Usage example:</b><br/>
+                Let's say, you are farming for Titania Prime. You open this site and set up 4 relics: Lith P4 intact, Neo T3 rad, Lith H3 rad and Lith T5 flawless. Then you press the generate button, open the game window,
+                and paste (ctrl + V) the message into the recruiting chat. For 20-30 seconds nothing happens, then you open the website again, press the button for a different text, and paste it again. After some time someone
+                messages you, stating he has Lith P4 intacts and Lith H3 rad relics, so you invite him. You come back to this site, set the squad size to 2, and click the star icon next to the P4 and H3 relics.
+                Now the generate button gives you a new message that has only the 2 important relics, and the new 2/4 squad size info at the end. Later someone else joins for H3 rad. You can then uncheck the important star
+                next to P4 and update the squad size again. After the full squad assembles, the Warframe RNG blesses you, and you get the rare part at the 1st try. You can then remove the H3 relic with the trash icon.<br/><br/>
             <b>Customization:</b><br/>
                 Open the settings (gear icon) to customize the relic grade, the starting and the ending alternatives. The variations should be separated with a ; character.
                 You can have as many and as long variations as you like. Don't use semicolon if you have one single value, because an empty string is a valid variation!

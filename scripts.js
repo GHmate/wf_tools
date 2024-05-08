@@ -304,10 +304,8 @@ function onloadRelics() {
     if (copyButton) {
         copyButton.addEventListener('click', startCopy);
     }
-    document.querySelectorAll('.form-check-input').forEach(item => {
-        if (item.getAttribute("type") === 'checkbox') {
-            item.addEventListener('click', recolorRow);
-        }
+    document.querySelectorAll('.js-activate-row').forEach(item => {
+        item.addEventListener('click', recolorRow);
     });
     document.querySelectorAll('.js-relic-name').forEach(item => {
         item.addEventListener('change', relicNameToUpper);
@@ -337,6 +335,10 @@ function onloadRelics() {
                 const nameInput = closestRelicBlock.querySelector('.js-relic-name');
                 nameInput.value = '';
                 nameInput.style = undefined;
+                const star = closestRelicBlock.querySelector('.js-activate-row:checked');
+                if (star) {
+                    star.click();
+                }
             }
         }
     }
@@ -507,29 +509,34 @@ function fadeElement(element) {
 }
 function startCopy () {
     let relics = [];
-    for (let i = 1; i <= 4; i++) {
-        let rt = document.querySelector('#rt' + i);
-        let rn = document.querySelector('#rn' + i);
-        let rg = document.querySelector('#rg' + i);
-        let ra = document.querySelector('#ra' + i);
-        if (ra.checked) {
-            if (rt.value !== 'type' && rn.value !== '' && rg.value !== 'grade') {
-                let relic1 = {
-                    'type': rt.value,
-                    'name': rn.value,
-                    'grade': rg.options[rg.selectedIndex].value
-                }
-                relics.push(relic1);
-            }
+    const importantRelics = document.querySelectorAll('.relic-block.active');
+    let onlyImportant = importantRelics.length > 0;
+    const relicsToGenerate = onlyImportant ? importantRelics : document.querySelectorAll('.relic-block');
+    for (let relicRow of relicsToGenerate) {
+        const type = relicRow.querySelector('.js-relic-type').value;
+        const name = relicRow.querySelector('.js-relic-name').value;
+        const grade = relicRow.querySelector('.js-relic-grade').value;
+        if (type === 'type' || name === '' || grade === 'grade') {
+            continue;
         }
+        relics.push({
+            'type': type,
+            'name': name,
+            'grade': grade
+        });
     }
+
     let teamSize = document.querySelector('input[name="team-size"]:checked').value;
     if (relics.length === 0) {
-        noti('No valid or active relic detected! Nothing to copy.', 2000, ERROR_COLOR);
+        if (onlyImportant) {
+            noti('None of the important relics are valid!', 3000, ERROR_COLOR);
+        } else {
+            noti('No valid relic detected!', 3000, ERROR_COLOR);
+        }
         return;
     }
     if (teamSize === '') {
-        noti('Set the squad size!', 2000, ERROR_COLOR);
+        noti('Set the squad size!', 3000, ERROR_COLOR);
         return;
     }
 

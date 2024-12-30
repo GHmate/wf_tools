@@ -120,6 +120,13 @@ const DEFAULT_WEEKLIES = {
         isDisabled: false,
         info: '',
         lastChanged: ''
+    },
+    yonta_kuva: {
+        displayName: `Archimedean Yonta's kuva offering`,
+        isCompleted: false,
+        isDisabled: false,
+        info: '',
+        lastChanged: ''
     }
 }
 

@@ -30,31 +30,11 @@ const DEFAULT_WEEKLIES = {
         lastWeekTimestamp: '',
         versionNumber: versionNumber
     },
-    acrithis_shop: {
-        displayName: `Acrithis offerings`,
-        isCompleted: false,
-        isDisabled: false,
-        info: '',
-        lastChanged: ''
-    },
-    archon_hunt: {
-        displayName: `Archon hunt`,
-        isCompleted: false,
-        isDisabled: false,
-        info: '',
-        lastChanged: ''
-    },
     baro_kiteer: {
         displayName: `Baro Ki'Teer`,
         isCompleted: false,
         isDisabled: false,
-        info: '',
-        lastChanged: ''
-    },
-    bird_shard: {
-        displayName: `Bird 3 archon shard`,
-        isCompleted: false,
-        isDisabled: false,
+        priority: 0,
         info: '',
         lastChanged: ''
     },
@@ -62,27 +42,23 @@ const DEFAULT_WEEKLIES = {
         displayName: `Deep/Elite Archimedea`,
         isCompleted: false,
         isDisabled: false,
+        priority: 1,
         info: '',
         lastChanged: ''
     },
-    help_clem: {
-        displayName: `Help Clem`,
+    archon_hunt: {
+        displayName: `Archon hunt`,
         isCompleted: false,
         isDisabled: false,
+        priority: 0,
         info: '',
         lastChanged: ''
     },
-    kahl_missions: {
-        displayName: `Kahl's mission`,
+    bird_shard: {
+        displayName: `Bird 3 archon shard`,
         isCompleted: false,
         isDisabled: false,
-        info: '',
-        lastChanged: ''
-    },
-    maroo_ayatan: {
-        displayName: `Maroo's ayatan hunt`,
-        isCompleted: false,
-        isDisabled: false,
+        priority: 0,
         info: '',
         lastChanged: ''
     },
@@ -90,20 +66,7 @@ const DEFAULT_WEEKLIES = {
         displayName: `Netracells`,
         isCompleted: false,
         isDisabled: false,
-        info: '',
-        lastChanged: ''
-    },
-    nightwave_shop: {
-        displayName: `Nightwave cred offerings`,
-        isCompleted: false,
-        isDisabled: false,
-        info: '',
-        lastChanged: ''
-    },
-    palladino_shop: {
-        displayName: `Palladino shop`,
-        isCompleted: false,
-        isDisabled: false,
+        priority: 0,
         info: '',
         lastChanged: ''
     },
@@ -111,13 +74,15 @@ const DEFAULT_WEEKLIES = {
         displayName: `Steel path shop`,
         isCompleted: false,
         isDisabled: false,
+        priority: 0,
         info: '',
         lastChanged: ''
     },
-    circuit: {
-        displayName: `The Circuit`,
+    palladino_shop: {
+        displayName: `Palladino shop`,
         isCompleted: false,
         isDisabled: false,
+        priority: 0,
         info: '',
         lastChanged: ''
     },
@@ -125,6 +90,63 @@ const DEFAULT_WEEKLIES = {
         displayName: `Archimedean Yonta's kuva offering`,
         isCompleted: false,
         isDisabled: false,
+        priority: 0,
+        info: '',
+        lastChanged: ''
+    },
+    circuit: {
+        displayName: `The Circuit`,
+        isCompleted: false,
+        isDisabled: false,
+        priority: 0,
+        info: '',
+        lastChanged: ''
+    },
+    calendar_1999: {
+        displayName: `1999 Calendar`,
+        isCompleted: false,
+        isDisabled: false,
+        priority: 0,
+        info: '',
+        lastChanged: ''
+    },
+    kahl_missions: {
+        displayName: `Kahl's mission`,
+        isCompleted: false,
+        isDisabled: false,
+        priority: 0,
+        info: '',
+        lastChanged: ''
+    },
+    acrithis_shop: {
+        displayName: `Acrithis offerings`,
+        isCompleted: false,
+        isDisabled: false,
+        priority: 0,
+        info: '',
+        lastChanged: ''
+    },
+    help_clem: {
+        displayName: `Help Clem`,
+        isCompleted: false,
+        isDisabled: false,
+        priority: 0,
+        info: '',
+        lastChanged: ''
+    },
+    maroo_ayatan: {
+        displayName: `Maroo's ayatan hunt`,
+        isCompleted: false,
+        isDisabled: false,
+        priority: 0,
+        info: '',
+        lastChanged: ''
+    },
+    nightwave_shop: {
+        displayName: `Nightwave cred offerings`,
+        isCompleted: false,
+        isDisabled: false,
+        priority: 0,
         info: '',
         lastChanged: ''
     }
@@ -184,6 +206,9 @@ async function getWeeklyData() {
                     if (key !== 'metaData' && newResult[key]) {
                         newResult[key]['isCompleted'] = val['isCompleted'];
                         newResult[key]['isDisabled'] = val['isDisabled'];
+                        if (val['priority']) {
+                            newResult[key]['priority'] = val['priority'];
+                        }
                     }
                 }
                 newResult.metaData.lastWeekTimestamp = result.metaData.lastWeekTimestamp;
@@ -625,7 +650,13 @@ function updateWeeklyHtml(data) {
     let activeAmnt = 0;
     let completedAmnt = 0;
     let disabledAmnt = 0;
-    for (let [key, dataObj] of Object.entries(data)) {
+
+    const sortedEntries = Object.entries(data).sort(([, a], [, b]) => {
+        const priorityA = a.priority ?? 0;
+        const priorityB = b.priority ?? 0;
+        return priorityB - priorityA;
+    });
+    for (let [key, dataObj] of sortedEntries) {
         if (key === 'metaData') {
             continue;
         }
@@ -662,6 +693,12 @@ function updateWeeklyHtml(data) {
                 <i class="bi-check-circle" onClick="completeWeekly(this, '${key}')" data-bs-toggle="tooltip" title="Mark as complete"></i>
                 <div class="title">${dataObj.displayName}</div>
                 ${infoHtml}
+                <div class="prio">
+                    <span class="label">priority</span>
+                    <span class="val">${dataObj.priority}</span>
+                    <i class="bi bi-arrow-up-circle" onclick="changePrio(this, '${key}', 1);" data-bs-toggle="tooltip" title="Move item up"></i>
+                    <i class="bi bi-arrow-down-circle" onclick="changePrio(this, '${key}', -1);" data-bs-toggle="tooltip" title="Move item down"></i>
+                </div>
                 <i class="bi-dash-circle-dotted" onClick="disableWeekly(this, '${key}')" data-bs-toggle="tooltip" title="Disable item"></i>
             </div>`;
         activeAmnt += 1;
@@ -687,6 +724,17 @@ function disableWeekly(element, id) {
 function completeWeekly(element, id) {
     bootstrap.Tooltip.getInstance(element)?.hide();
     weekly_data[id].isCompleted = true;
+    writeIndexedDB(DB_WEEKLY_TASKS, 'data', weekly_data).then(f => updateWeeklyHtml(weekly_data));
+}
+function changePrio(element, id, change) {
+    bootstrap.Tooltip.getInstance(element)?.hide();
+    const valueBefore = weekly_data[id]?.priority || 0;
+    const newValue = valueBefore + change;
+    if (newValue < 0 || newValue > 5) {
+        return;
+    }
+
+    weekly_data[id].priority = newValue;
     writeIndexedDB(DB_WEEKLY_TASKS, 'data', weekly_data).then(f => updateWeeklyHtml(weekly_data));
 }
 function uncompleteWeekly(element, id) {
@@ -724,6 +772,7 @@ function updateDataUsingApiData(serverData) {
 
     const isBaroActive = currentTime >= baroStartTime && currentTime <= baroEndTime;
     weekly_data.baro_kiteer.info = isBaroActive ? `He is here! On ${serverData.voidTrader.location}` : `Arrives in: ${serverData.voidTrader.startString}`;
+    weekly_data.calendar_1999.info = get1999Season();
     writeIndexedDB(DB_WEEKLY_TASKS, 'data', weekly_data).then(f => updateWeeklyHtml(weekly_data));
 }
 function isOnThisWeek (date, weekStartDateStr) {
@@ -820,4 +869,14 @@ function getUsefulRewards(data) {
     }
 
     return result;
+}
+function get1999Season() {
+    const referenceDate = new Date("2024-12-22");
+    const seasons = ["Spring (Jade eximus)", "Summer (Arson eximus)", "Autumn (Parasitic eximus)", "Winter (Arctic eximus)"];
+    const currentDate = new Date();
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const daysDifference = Math.floor((currentDate - referenceDate) / msPerDay);
+    const weeksDifference = Math.floor(daysDifference / 7);
+    const currentSeasonIndex = (weeksDifference % 4 + 4) % 4; // Ensure positive modulus
+    return seasons[currentSeasonIndex];
 }

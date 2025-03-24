@@ -295,6 +295,8 @@ a:hover {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    margin-inline: auto;
+    max-width: 1400px;
 }
 .task-type-nav > * {
     flex: 1 1 140px;
@@ -304,21 +306,37 @@ a:hover {
 .todo-list-container {
     margin-top: 40px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(600px, 100%), 1fr));
+    grid-template-columns: 1fr;
+    max-width: 700px;
     gap: 10px;
     flex-wrap: wrap;
+    margin-inline: auto;
+    @media (width >= 1200px) {
+        grid-template-columns: 1fr 1fr;
+        max-width: 1400px;
+    }
 }
 .todo-list-item {
-    flex: 1 1 600px;
     color: white;
     font-size: clamp(16px, 3vw, 18px);
     border-radius: 10px;
     display: flex;
     gap: min(4%, 22px);
     align-items: center;
+    overflow: hidden;
+}
+.todo-list-item.animate {
+    animation: blink 1s ease-in;
+}
+.todo-list-item > * {
+    padding-block: 10px;
 }
 .todo-list-item > .title {
     flex-grow: 1;
+    padding-left: 15px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 .todo-list-item > input {
     width: 20px;
@@ -330,16 +348,22 @@ a:hover {
     line-height: 17px;
     cursor: pointer;
 }
+.todo-list-item .info {
+    display: flex;
+}
 .todo-list-item .prio {
+    height: 100%;
     display: grid;
     grid-template-rows: 1fr 1fr;
     grid-template-columns: auto auto;
     grid-template-areas:
-    "label up"
+    "value up"
     "value down";
     font-size: 14px;
     place-items: center;
     column-gap: 5px;
+    row-gap: 3px;
+    padding-block: 0;
     @media (max-width: 500px) {
         grid-template-areas:
         "value up"
@@ -353,31 +377,42 @@ a:hover {
     }
 }
 .todo-list-item .prio .val{
+    font-size: 18px;
     grid-area: value;
+    padding-inline: 3px;
+    padding-block: 8px;
+    cursor: default;
 }
-.todo-list-item .prio .bi-arrow-up-circle{
+.todo-list-item .prio .bi {
     font-size: 20px;
+    background-color: #294877;
+    height: 100%;
+    padding-inline: 2px;
+    display: flex;
+    align-items: center;
+}
+.todo-list-item .prio .bi-caret-up-fill {
     grid-area: up;
+    border-bottom-left-radius: 4px;
 }
-.todo-list-item .prio .bi-arrow-down-circle{
-    font-size: 20px;
+.todo-list-item .prio .bi-caret-down-fill {
     grid-area: down;
+    border-top-left-radius: 4px;
 }
 
 #active-container .todo-list-item {
     background-color: #365b91;
     border: #0a0a0a solid 1px;
-    padding: 10px 15px;
 }
 #completed-container .todo-list-item {
     background-color: #346737;
     border: #0a0a0a solid 1px;
-    padding: 10px 15px;
+    padding-right: 10px;
 }
 #disabled-container .todo-list-item {
     background-color: #595959;
     border: #0a0a0a solid 1px;
-    padding: 10px 15px;
+    padding-right: 10px;
 }
 
 .noti-block {
@@ -476,5 +511,14 @@ input[type=checkbox].custom {
     to {
         color: white;
         --opacity: 0;
+    }
+}
+
+@keyframes blink {
+    from {
+        background-color: #718db7;
+    }
+    to {
+        background-color: #365b91;
     }
 }

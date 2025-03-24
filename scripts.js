@@ -34,15 +34,23 @@ const DEFAULT_WEEKLIES = {
         displayName: `Baro Ki'Teer`,
         isCompleted: false,
         isDisabled: false,
-        priority: 0,
+        priority: 2,
         info: '',
         lastChanged: ''
     },
-    archimedea: {
-        displayName: `Deep/Elite Archimedea`,
+    archimedea1: {
+        displayName: `Deep Archimedea`,
         isCompleted: false,
         isDisabled: false,
-        priority: 1,
+        priority: 3,
+        info: '',
+        lastChanged: ''
+    },
+    archimedea2: {
+        displayName: `Temporal Archimedea`,
+        isCompleted: false,
+        isDisabled: false,
+        priority: 3,
         info: '',
         lastChanged: ''
     },
@@ -50,7 +58,7 @@ const DEFAULT_WEEKLIES = {
         displayName: `Archon hunt`,
         isCompleted: false,
         isDisabled: false,
-        priority: 0,
+        priority: 2,
         info: '',
         lastChanged: ''
     },
@@ -58,7 +66,7 @@ const DEFAULT_WEEKLIES = {
         displayName: `Bird 3 archon shard`,
         isCompleted: false,
         isDisabled: false,
-        priority: 0,
+        priority: 2,
         info: '',
         lastChanged: ''
     },
@@ -66,7 +74,7 @@ const DEFAULT_WEEKLIES = {
         displayName: `Netracells`,
         isCompleted: false,
         isDisabled: false,
-        priority: 0,
+        priority: 2,
         info: '',
         lastChanged: ''
     },
@@ -74,7 +82,7 @@ const DEFAULT_WEEKLIES = {
         displayName: `Steel path shop`,
         isCompleted: false,
         isDisabled: false,
-        priority: 0,
+        priority: 2,
         info: '',
         lastChanged: ''
     },
@@ -82,7 +90,7 @@ const DEFAULT_WEEKLIES = {
         displayName: `Palladino shop`,
         isCompleted: false,
         isDisabled: false,
-        priority: 0,
+        priority: 2,
         info: '',
         lastChanged: ''
     },
@@ -90,7 +98,7 @@ const DEFAULT_WEEKLIES = {
         displayName: `Archimedean Yonta's kuva offering`,
         isCompleted: false,
         isDisabled: false,
-        priority: 0,
+        priority: 2,
         info: '',
         lastChanged: ''
     },
@@ -98,7 +106,7 @@ const DEFAULT_WEEKLIES = {
         displayName: `The Circuit`,
         isCompleted: false,
         isDisabled: false,
-        priority: 0,
+        priority: 2,
         info: '',
         lastChanged: ''
     },
@@ -106,7 +114,7 @@ const DEFAULT_WEEKLIES = {
         displayName: `1999 Calendar`,
         isCompleted: false,
         isDisabled: false,
-        priority: 0,
+        priority: 2,
         info: '',
         lastChanged: ''
     },
@@ -114,7 +122,7 @@ const DEFAULT_WEEKLIES = {
         displayName: `Kahl's mission`,
         isCompleted: false,
         isDisabled: false,
-        priority: 0,
+        priority: 2,
         info: '',
         lastChanged: ''
     },
@@ -122,7 +130,7 @@ const DEFAULT_WEEKLIES = {
         displayName: `Acrithis offerings`,
         isCompleted: false,
         isDisabled: false,
-        priority: 0,
+        priority: 2,
         info: '',
         lastChanged: ''
     },
@@ -130,7 +138,7 @@ const DEFAULT_WEEKLIES = {
         displayName: `Help Clem`,
         isCompleted: false,
         isDisabled: false,
-        priority: 0,
+        priority: 2,
         info: '',
         lastChanged: ''
     },
@@ -138,7 +146,7 @@ const DEFAULT_WEEKLIES = {
         displayName: `Maroo's ayatan hunt`,
         isCompleted: false,
         isDisabled: false,
-        priority: 0,
+        priority: 2,
         info: '',
         lastChanged: ''
     },
@@ -146,7 +154,7 @@ const DEFAULT_WEEKLIES = {
         displayName: `Nightwave cred offerings`,
         isCompleted: false,
         isDisabled: false,
-        priority: 0,
+        priority: 2,
         info: '',
         lastChanged: ''
     }
@@ -670,9 +678,8 @@ function updateWeeklyHtml(data) {
         if (dataObj.isDisabled) {
             disabledHtml += `
                 <div class="todo-list-item" id="${key}">
+                    <div class="title">${dataObj.displayName} ${infoHtml}</div>
                     <i class="bi-arrow-left-circle" onClick="restoreWeekly(this, '${key}')" data-bs-toggle="tooltip" title="Enable item"></i>
-                    <div class="title">${dataObj.displayName}</div>
-                    ${infoHtml}
                 </div>`;
             disabledAmnt += 1;
             continue;
@@ -680,9 +687,8 @@ function updateWeeklyHtml(data) {
         if (dataObj.isCompleted) {
             completedHtml += `
                 <div class="todo-list-item" id="${key}">
+                    <div class="title">${dataObj.displayName} ${infoHtml}</div>
                     <i class="bi-x-circle" onClick="uncompleteWeekly(this, '${key}')" data-bs-toggle="tooltip" title="Mark as incomplete"></i>
-                    <div class="title">${dataObj.displayName}</div>
-                    ${infoHtml}
                     <i class="bi-dash-circle-dotted" onClick="disableWeekly(this, '${key}')" data-bs-toggle="tooltip" title="Disable item"></i>
                 </div>`;
             completedAmnt += 1;
@@ -690,16 +696,14 @@ function updateWeeklyHtml(data) {
         }
         activeHtml += `
             <div class="todo-list-item" id="${key}">
+                <div class="title">${dataObj.displayName} ${infoHtml}</div>
                 <i class="bi-check-circle" onClick="completeWeekly(this, '${key}')" data-bs-toggle="tooltip" title="Mark as complete"></i>
-                <div class="title">${dataObj.displayName}</div>
-                ${infoHtml}
-                <div class="prio">
-                    <span class="label">priority</span>
-                    <span class="val">${dataObj.priority}</span>
-                    <i class="bi bi-arrow-up-circle" onclick="changePrio(this, '${key}', 1);" data-bs-toggle="tooltip" title="Move item up"></i>
-                    <i class="bi bi-arrow-down-circle" onclick="changePrio(this, '${key}', -1);" data-bs-toggle="tooltip" title="Move item down"></i>
-                </div>
                 <i class="bi-dash-circle-dotted" onClick="disableWeekly(this, '${key}')" data-bs-toggle="tooltip" title="Disable item"></i>
+                <div class="prio">
+                    <span class="val" data-bs-toggle="tooltip" title="Priority">${dataObj.priority}</span>
+                    <i class="bi bi-caret-up-fill" onclick="changePrio(this, '${key}', 1);" data-bs-toggle="tooltip" title="Move item up"></i>
+                    <i class="bi bi-caret-down-fill" onclick="changePrio(this, '${key}', -1);" data-bs-toggle="tooltip" title="Move item down"></i>
+                </div>
             </div>`;
         activeAmnt += 1;
     }
@@ -735,7 +739,10 @@ function changePrio(element, id, change) {
     }
 
     weekly_data[id].priority = newValue;
-    writeIndexedDB(DB_WEEKLY_TASKS, 'data', weekly_data).then(f => updateWeeklyHtml(weekly_data));
+    writeIndexedDB(DB_WEEKLY_TASKS, 'data', weekly_data).then(function() {
+        updateWeeklyHtml(weekly_data);
+        document.getElementById(id).classList.add('animate');
+    });
 }
 function uncompleteWeekly(element, id) {
     bootstrap.Tooltip.getInstance(element)?.hide();

@@ -60,7 +60,7 @@ nav > .site-nav {
     justify-content: center;
 }
 .nav-item {
-    padding: 10px;
+    padding: 6px;
     border: #0a0a0a solid 1px;
     color: white;
     border-radius: 10px;
@@ -103,7 +103,7 @@ nav > .site-nav {
     color: #ffffff;
     margin-inline: CALC(3% + 5px);
     border-radius: 10px;
-    padding: calc(1% + 10px);
+    padding: calc(1% + 5px);
 }
 h4 {
     margin: 20px 0 10px 0;
@@ -304,7 +304,7 @@ a:hover {
     font-size: clamp(16px, 3vw, 20px);
 }
 .todo-list-container {
-    margin-top: 40px;
+    margin-top: 30px;
     display: grid;
     grid-template-columns: 1fr;
     max-width: 700px;

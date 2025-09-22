@@ -134,6 +134,14 @@ const DEFAULT_WEEKLIES = {
         info: '',
         lastChanged: ''
     },
+    invigoration: {
+        displayName: `Helminth Invigoration`,
+        isCompleted: false,
+        isDisabled: false,
+        priority: 2,
+        info: '',
+        lastChanged: ''
+    },
     help_clem: {
         displayName: `Help Clem`,
         isCompleted: false,
@@ -778,7 +786,8 @@ function updateDataUsingApiData(serverData) {
     }
 
     const isBaroActive = currentTime >= baroStartTime && currentTime <= baroEndTime;
-    weekly_data.baro_kiteer.info = isBaroActive ? `He is here! On ${serverData.voidTrader.location}` : `Arrives in: ${serverData.voidTrader.startString}`;
+    const baroTimeLeft = diffInDaysAndHours(currentTime, baroStartTime);
+    weekly_data.baro_kiteer.info = isBaroActive ? `He is here! On ${serverData.voidTrader.location}` : `Arrives in: ${baroTimeLeft}`;
     weekly_data.calendar_1999.info = get1999Season();
     writeIndexedDB(DB_WEEKLY_TASKS, 'data', weekly_data).then(f => updateWeeklyHtml(weekly_data));
 }
@@ -847,7 +856,7 @@ function getUsefulRewards(data) {
     }
 
     let result = '';
-    const usefulRewards = ['forma', 'catalyst', 'reactor', 'adapter'];
+    const usefulRewards = ['forma', 'catalyst', 'reactor', 'adapter', 'archon'];
     if (data.defenderReward?.asString) {
         let rewardStr = data.defenderReward.asString.toLowerCase();
         if (usefulRewards.some(substring => rewardStr.includes(substring))) {
@@ -868,6 +877,9 @@ function getUsefulRewards(data) {
     }
     if (data.rewards) {
         for (let reward of data.rewards) {
+            if (!reward?.asString) {
+                continue;
+            }
 			let rewardStr = reward.asString.toLowerCase();
 			if (usefulRewards.some(substring => rewardStr.includes(substring))) {
 				result += `${rewardStr}`;
@@ -886,4 +898,11 @@ function get1999Season() {
     const weeksDifference = Math.floor(daysDifference / 7);
     const currentSeasonIndex = (weeksDifference % 4 + 4) % 4; // Ensure positive modulus
     return seasons[currentSeasonIndex];
+}
+function diffInDaysAndHours(date1, date2) {
+    let diffMs = Math.abs(date2 - date1);
+    let totalHours = Math.floor(diffMs / (1000 * 60 * 60));
+    let days = Math.floor(totalHours / 24);
+    let hours = totalHours % 24;
+    return `${days} days, ${hours} hours`;
 }

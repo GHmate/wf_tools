@@ -429,12 +429,13 @@ function initIndexedDBWeeklies() {
         db = request.result;
         weekly_data = await getWeeklyData();
         const apiData = await fetchApiData();
-        if (!apiData.archonHunt) {
-            throw new Error('Error fetching api time data.');
+        if (!apiData?.archonHunt && !apiData?.Version) {
+            alert('Error fetching Warframe api data.');
+            throw new Error('Error fetching Warframe api data.');
         }
-        updateDataUsingApiData(apiData);
+        updateDataUsingApiData(apiData, true);
         updateWeeklyHtml(weekly_data);
-        initPointsOfInterests(apiData);
+        initPointsOfInterests(/*apiData*/);
     }
 }
 function copyTextToClipboard(text) {
@@ -765,17 +766,28 @@ function resetTooltips() {
 }
 async function fetchApiData() {
     try {
-        const response = await fetch('https://api.warframestat.us/pc');
+        const response = await fetch('https://api.warframe.com/cdn/worldState.php');
         return await response.json();
     } catch (error) {
         throw new Error('Error fetching api data.');
     }
 }
-function updateDataUsingApiData(serverData) {
-    const currentTime = new Date(serverData.timestamp);
-    const baroStartTime = new Date(serverData.voidTrader.activation);
-    const baroEndTime = new Date(serverData.voidTrader.expiry);
-    const weekStartDateStr = serverData.archonHunt.activation;
+function updateDataUsingApiData(serverData, directApi) {
+    let currentTime;
+    let baroStartTime;
+    let baroEndTime;
+    let weekStartDateStr;
+    if (directApi) {
+        currentTime = new Date(parseInt(serverData.Time) * 1000);
+        baroStartTime = new Date(parseInt(serverData.VoidTraders[0].Activation.$date.$numberLong));
+        baroEndTime = new Date(parseInt(serverData.VoidTraders[0].Expiry.$date.$numberLong));
+        weekStartDateStr = serverData.LiteSorties[0].Activation.$date.$numberLong;
+    } else {
+        currentTime = new Date(serverData.timestamp);
+        baroStartTime = new Date(serverData.voidTrader.activation);
+        baroEndTime = new Date(serverData.voidTrader.expiry);
+        weekStartDateStr = serverData.archonHunt.activation;
+    }
 
     if (weekly_data.metaData.lastWeekTimestamp !== weekStartDateStr) {
         weekly_data.metaData.lastWeekTimestamp = weekStartDateStr;
@@ -787,13 +799,17 @@ function updateDataUsingApiData(serverData) {
 
     const isBaroActive = currentTime >= baroStartTime && currentTime <= baroEndTime;
     const baroTimeLeft = diffInDaysAndHours(currentTime, baroStartTime);
-    weekly_data.baro_kiteer.info = isBaroActive ? `He is here! On ${serverData.voidTrader.location}` : `Arrives in: ${baroTimeLeft}`;
+    if (directApi) {
+        weekly_data.baro_kiteer.info = isBaroActive ? `He is here! On ${serverData.VoidTraders[0].Node}` : `Arrives in: ${baroTimeLeft}`;
+    } else {
+        weekly_data.baro_kiteer.info = isBaroActive ? `He is here! On ${serverData.voidTrader.location}` : `Arrives in: ${baroTimeLeft}`;
+    }
     weekly_data.calendar_1999.info = get1999Season();
     writeIndexedDB(DB_WEEKLY_TASKS, 'data', weekly_data).then(f => updateWeeklyHtml(weekly_data));
 }
 function isOnThisWeek (date, weekStartDateStr) {
-    const startOfWeek = new Date(weekStartDateStr);
-    const endOfWeek = new Date(weekStartDateStr);
+    const startOfWeek = new Date(parseInt(weekStartDateStr));
+    const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(endOfWeek.getDate() + 7);
 
     return date >= startOfWeek && date < endOfWeek;
@@ -805,6 +821,10 @@ function removeWeeklySavedData() {
     });
 }
 function initPointsOfInterests(apiData) {
+    if (!apiData) {
+        return false;
+    }
+
     let poiHtml = '';
 	if (apiData.events) {
         const checks = ['Gift','Gifts'];
@@ -900,6 +920,7 @@ function get1999Season() {
     return seasons[currentSeasonIndex];
 }
 function diffInDaysAndHours(date1, date2) {
+    console.log(date1, date2);
     let diffMs = Math.abs(date2 - date1);
     let totalHours = Math.floor(diffMs / (1000 * 60 * 60));
     let days = Math.floor(totalHours / 24);

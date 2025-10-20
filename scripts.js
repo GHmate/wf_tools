@@ -766,7 +766,8 @@ function resetTooltips() {
 }
 async function fetchApiData() {
     try {
-        const response = await fetch('https://api.warframe.com/cdn/worldState.php');
+        const url = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.warframe.com/cdn/worldState.php');
+        const response = await fetch(url);
         return await response.json();
     } catch (error) {
         throw new Error('Error fetching api data.');

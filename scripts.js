@@ -921,7 +921,6 @@ function get1999Season() {
     return seasons[currentSeasonIndex];
 }
 function diffInDaysAndHours(date1, date2) {
-    console.log(date1, date2);
     let diffMs = Math.abs(date2 - date1);
     let totalHours = Math.floor(diffMs / (1000 * 60 * 60));
     let days = Math.floor(totalHours / 24);

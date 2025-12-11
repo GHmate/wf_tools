@@ -54,6 +54,14 @@ const DEFAULT_WEEKLIES = {
         info: '',
         lastChanged: ''
     },
+    descendia: {
+        displayName: `Descendia`,
+        isCompleted: false,
+        isDisabled: false,
+        priority: 3,
+        info: '',
+        lastChanged: ''
+    },
     archon_hunt: {
         displayName: `Archon hunt`,
         isCompleted: false,

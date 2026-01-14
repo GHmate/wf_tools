@@ -436,12 +436,18 @@ function initIndexedDBWeeklies() {
     request.onsuccess = async function () {
         db = request.result;
         weekly_data = await getWeeklyData();
-        const apiData = await fetchApiData();
+        let apiData = null;
+        let isOriginalWordState = false;
+        apiData = await fetchApiDataWarframestat();
+        if (!apiData) {
+            apiData = await fetchApiDataWorldstate();
+            isOriginalWordState = true
+        }
         if (!apiData?.archonHunt && !apiData?.Version) {
             alert('Error fetching Warframe api data.');
             throw new Error('Error fetching Warframe api data.');
         }
-        updateDataUsingApiData(apiData, true);
+        updateDataUsingApiData(apiData, isOriginalWordState);
         updateWeeklyHtml(weekly_data);
         initPointsOfInterests(/*apiData*/);
     }
@@ -772,13 +778,22 @@ function resetTooltips() {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     })
 }
-async function fetchApiData() {
+
+async function fetchApiDataWarframestat() {
+    try {
+        const response = await fetch('https://api.warframestat.us/pc');
+        return await response.json();
+    } catch (error) {
+        return null;
+    }
+}
+async function fetchApiDataWorldstate() {
     try {
         const url = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.warframe.com/cdn/worldState.php');
         const response = await fetch(url);
         return await response.json();
     } catch (error) {
-        throw new Error('Error fetching api data.');
+        return null;
     }
 }
 function updateDataUsingApiData(serverData, directApi) {
@@ -790,12 +805,12 @@ function updateDataUsingApiData(serverData, directApi) {
         currentTime = new Date(parseInt(serverData.Time) * 1000);
         baroStartTime = new Date(parseInt(serverData.VoidTraders[0].Activation.$date.$numberLong));
         baroEndTime = new Date(parseInt(serverData.VoidTraders[0].Expiry.$date.$numberLong));
-        weekStartDateStr = serverData.LiteSorties[0].Activation.$date.$numberLong;
+        weekStartDateStr = parseInt(serverData.LiteSorties[0].Activation.$date.$numberLong);
     } else {
         currentTime = new Date(serverData.timestamp);
         baroStartTime = new Date(serverData.voidTrader.activation);
         baroEndTime = new Date(serverData.voidTrader.expiry);
-        weekStartDateStr = serverData.archonHunt.activation;
+        weekStartDateStr = new Date(serverData.archonHunt.activation).getTime();
     }
 
     if (weekly_data.metaData.lastWeekTimestamp !== weekStartDateStr) {
